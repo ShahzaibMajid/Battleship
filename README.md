@@ -1,4 +1,4 @@
 BattleShip
 ==========
 
-Project for CSC524 at the University of Miami.
+Project for CSC524 at the University of Miami bitch.
