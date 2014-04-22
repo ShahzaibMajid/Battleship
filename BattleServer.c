@@ -15,6 +15,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <unistd.h>
 
 /* Definitions */
 #define PORT "3369" //port that is used for server and players
@@ -26,13 +27,10 @@ int players[MAX_PLAYERS];
 
 /* Grid Generator*/
 void generateGrid() {
-
-
 }
 
 /* Update Grid*/
 void updateGrid() {
-
 }
 
 /* Main Controller*/
@@ -43,7 +41,7 @@ int main(int argc, char *argv[]) {
   int status;
   struct sockaddr_storage player_addr;
   int player; //file descriptors for both players (essentially newfd)
-  int how; //use this to prevent a player from sending after his turn 
+  int how; //use this to prevent a player from sending after his turn
   struct addrinfo hints, *res;
   struct addrinfo *servinfo;
   socklen_t addr_size;
@@ -51,7 +49,7 @@ int main(int argc, char *argv[]) {
   int playersNeeded = 2;
   int x = 0; //x coordinate in grid
   int y = 0; //y coordinate in grid
-                                                                   
+
 /* Establish Server*/
   memset(&hints,0,sizeof(hints));
   hints.ai_family = AF_INET;
@@ -62,7 +60,7 @@ int main(int argc, char *argv[]) {
     fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(status));
     exit(1); //Good Job You Failed :D
   }
-  
+
   /* Wait to accept incoming connection*/
   // loop through all results and bind to the first we can
   for(res = servinfo; res != NULL; res = res->ai_next) {
@@ -82,7 +80,7 @@ int main(int argc, char *argv[]) {
       continue;
     }
     break;
-  }  
+  }
 
   if(res == NULL) {
     fprintf(stderr, "server: failed to bind\n");
@@ -97,7 +95,7 @@ int main(int argc, char *argv[]) {
   if(listen(sockfd,MAX_PLAYERS) == -1) {
     perror("listen");
     exit(1);
-  }  
+  }
   printf("Battleship Server : Waiting for %d Player(s) to Connect...\n",playersNeeded);
 
   /*Get Players*/
@@ -115,7 +113,8 @@ int main(int argc, char *argv[]) {
   printf("Server is generating Battlefield grids for both players...\n");
 
   //---Generate the grids for both players on server
-  generateGrids();
+  generateGrid();
   //---Ask players to place ships on grid as chosen
 
+	return 0;
 }
