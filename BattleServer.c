@@ -23,13 +23,29 @@
 #define DIM 11 //dimension
 
 typedef struct {
-  char grid[DIM][DIM]; //10 x 10 grid
+  char grid[DIM][DIM]; //11 x 11 grid (actually 10 x 10)
 } Grid;
 
 int players[MAX_PLAYERS];
 Grid pl_1; //grid of player 1
 Grid pl_2; //grid of player 2
 
+/*Print out Grid*/
+void printGrid() {
+
+  int i,j = 0;
+
+  for(i=0;i<DIM;i++) {
+    for(j=0;j<DIM;j++) {
+      printf("pl_1.grid[%d][%d] = %d\n",i,j,pl_1.grid[i][j]);
+    }
+  }
+}
+
+/* Update Grid*/
+void updateGrid() {
+
+}
 /* Grid Generator*/
 void generateGrid(int x, int y) {
 
@@ -61,23 +77,6 @@ void generateGrid(int x, int y) {
     }
   }
 }
-
-/*Print out Grid*/
-void printGrid() {
-
-  int i,j = 0;
-
-  for(i=0;i<DIM;i++) {
-    for(j=0;j<DIM;j++) {
-      printf("pl_1.grid[%d][%d] = %d\n",i,j,a[i][j]);
-    }
-  }
-}
-/* Update Grid*/
-void updateGrid() {
-
-}
-
 /* Main Controller*/
 int main(int argc, char *argv[]) {
 
