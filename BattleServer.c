@@ -27,27 +27,36 @@ typedef struct {
 } Grid;
 
 int players[MAX_PLAYERS];
-Grid pl_1;
-Grid pl_2;
+Grid pl_1; //grid of player 1
+Grid pl_2; //grid of player 2
 
 /* Grid Generator*/
 void generateGrid(int x, int y) {
 
   int ascii = 65; //ascii value of 'A'
-  x = 0;
-  y = 0;
+  int pos = 1; //first position on grid for row
 
-  //Generate Letters A-L on grid
-  for(y = 0;y < DIM; y++) {
-    if(x = 0 && y = 0) { //point (0,0) on grid
-      pl_1.grid[x][y] = '#'; //marks no man land coordinate in grid   
-      pl_2.grid[x][y] = '#';
-    } else {
-	pl_1.grid[x][y] = (char)ascii;
-	pl_2.grid[x][y] = (char)(ascii++);
-    }
+  x = 0;
+  pl_1.grid[0][0] = '#'; //marks no man land coordinate in grid                                  
+  pl_2.grid[0][0] = '#';
+
+  //Generate Letters A-L on columns of the grid
+  for(y = 1;y < DIM; y++) {
+    pl_1.grid[x][y] = (char)ascii;
+    pl_2.grid[x][y] = (char)(ascii++);
+  }  
+
+  y = 0;
+  //Set numbers on rows of the grid (#1-10)
+  for(x = 1; x < DIM; x++) {
+    pl_1.grid[x][y] =  pos;
+    pl_2.grid[x][y] =  pos++;
   }
+ 
+  //Set battlefield to empty characters
+
 }
+
 
 /* Update Grid*/
 void updateGrid() {
