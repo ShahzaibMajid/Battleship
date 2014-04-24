@@ -20,17 +20,38 @@
 /* Definitions */
 #define PORT "3369" //port that is used for server and players
 #define MAX_PLAYERS 2 //max num of players
-typedef struct {
+#define DIM 11 //dimension
 
+typedef struct {
+  char grid[DIM][DIM]; //10 x 10 grid
 } Grid;
+
 int players[MAX_PLAYERS];
+Grid pl_1;
+Grid pl_2;
 
 /* Grid Generator*/
-void generateGrid() {
+void generateGrid(int x, int y) {
+
+  int ascii = 65; //ascii value of 'A'
+  x = 0;
+  y = 0;
+
+  //Generate Letters A-L on grid
+  for(y = 0;y < DIM; y++) {
+    if(x = 0 && y = 0) { //point (0,0) on grid
+      pl_1.grid[x][y] = '#'; //marks no man land coordinate in grid   
+      pl_2.grid[x][y] = '#';
+    } else {
+	pl_1.grid[x][y] = (char)ascii;
+	pl_2.grid[x][y] = (char)(ascii++);
+    }
+  }
 }
 
 /* Update Grid*/
 void updateGrid() {
+
 }
 
 /* Main Controller*/
@@ -40,7 +61,7 @@ int main(int argc, char *argv[]) {
   int sockfd; //socket file descriptor
   int status;
   struct sockaddr_storage player_addr;
-  int player; //file descriptors for both players (essentially newfd)
+  int player1_fd,player2_fd; //file descriptors for both players (essentially newfd)
   int how; //use this to prevent a player from sending after his turn
   struct addrinfo hints, *res;
   struct addrinfo *servinfo;
@@ -49,6 +70,7 @@ int main(int argc, char *argv[]) {
   int playersNeeded = 2;
   int x = 0; //x coordinate in grid
   int y = 0; //y coordinate in grid
+  char buf[8096];
 
 /* Establish Server*/
   memset(&hints,0,sizeof(hints));
@@ -99,22 +121,40 @@ int main(int argc, char *argv[]) {
   printf("Battleship Server : Waiting for %d Player(s) to Connect...\n",playersNeeded);
 
   /*Get Players*/
-  while(playersNeeded != 0) {
+  while(playersNeeded != 1) {
     addr_size = sizeof(player_addr);
-    player = accept(sockfd,(struct sockaddr *)&player_addr, &addr_size);
-    if (player == -1) {
+    player1_fd = accept(sockfd,(struct sockaddr *)&player_addr, &addr_size);
+    if (player1_fd == -1) {
       perror("Error in Connecting Player to Server");
       continue;
     } else {
-      printf("Battleship Server : Waiting for %d Player(s) to Connect...\n",--playersNeeded);
+      --playersNeeded;
+      strncpy(buf, "Battleship Server : Waiting for 1 more player to connect...\n", 8095);
+      buf[8096] = '\0';
+      printf("%s", buf);
+      write(player1_fd, buf, 60); 
     }
   }
-  printf("All players connected.\n");
-  printf("Server is generating Battlefield grids for both players...\n");
+
+  while(playersNeeded != 0) {
+    addr_size = sizeof(player_addr);
+    player2_fd = accept(sockfd,(struct sockaddr *)&player_addr, &addr_size);
+    if (player2_fd == -1) {
+      perror("Error in Connecting Player to Server");
+      continue;
+    } else {
+      --playersNeeded;
+      strncpy(buf, "All players connected.\n Server is generating Battlefield grids for both players...\n", 8095);
+      buf[8096]= '\0';
+      printf("%s", buf);
+      write(player1_fd,buf, 83);
+      write(player2_fd, buf, 83);
+    }
+  }
 
   //---Generate the grids for both players on server
-  generateGrid();
+  generateGrid(x,y);
   //---Ask players to place ships on grid as chosen
 
-	return 0;
+  return 0;
 }
