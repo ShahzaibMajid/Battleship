@@ -50,7 +50,7 @@ void updateGrid() {
 void generateGrid(int x, int y) {
 
   int ascii = 65; //ascii value of 'A'
-  int pos = 1; //first position on grid for row
+  int pos = 48; //first position on grid for row
 
   x = 0;
   pl_1.grid[0][0] = '#'; //marks no man land coordinate in grid                                  
@@ -65,10 +65,10 @@ void generateGrid(int x, int y) {
   y = 0;
   //Set numbers on rows of the grid (#1-10)
   for(x = 1; x < DIM; x++) {
-    pl_1.grid[x][y] =  pos;
-    pl_2.grid[x][y] =  pos++;
+    pl_1.grid[x][y] =  (char)pos;
+    pl_2.grid[x][y] =  (char)(pos++);
   }
- 
+
   //Set battlefield with (W)ater character
   for(x = 1; x < DIM; x++) {
     for(y = 1; y < DIM; y++) {
