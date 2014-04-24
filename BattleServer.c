@@ -29,8 +29,8 @@ typedef struct {
 } Grid;
 Grid pl_1; //grid of player 1
 Grid pl_2; //grid of player 2
-int grid_height;
-int grid_length;
+int grid_height = 11;
+int grid_length = 11;
 char t_por[7]; //top portion of the box
 char m_por[7]; //middle portion of the box
 
@@ -41,12 +41,48 @@ char m_por[7]; //middle portion of the box
 void printGrid() {
 
   int i,j = 0;
+ 
+  for(j = 0; j < grid_height; ++j) {
+    for(i = 0; i < grid_width; ++i) {
+      printf("%s",t_por);
+      if(i == (grid_width-1)) {
+	printf("+");
+      }
+    }
+    printf("\n");
+    for(i = 0; i < grid_width;++i) {
+      printf("%s",m_por);
+      if(i == (grid_width-1)) {
+	printf("|");
+      }
+    }
+    printf("\n");
+    for(i = 0; i < gridwidth; ++i) {
+      printf("%s",m_por);
+      if(i == (grid_width -1)) {
+	printf("|");
+      }
+    }
+    printf("\n");
+    if (j == (grid_height-1)) {
+      for (i=0; i<grid_width; ++i) {
+	printf("%s", t_por);
+	if (i == (grid_width - 1)) {
+	  printf("+");
+	}
+      }
+    }
+  }
+  printf("\n");
 
+ /*
   for(i=0;i<DIM;i++) {
     for(j=0;j<DIM;j++) {
       printf("pl_1.grid[%d][%d] = %c\n",i,j,pl_1.grid[i][j]);
     }
   }
+  */
+
 }
 
 /* Update Grid*/
@@ -102,7 +138,7 @@ int main(int argc, char *argv[]) {
   int x = 0; //x coordinate in grid
   int y = 0; //y coordinate in grid
   char buf[8096];
-
+  
 /* Establish Server*/
   memset(&hints,0,sizeof(hints));
   hints.ai_family = AF_INET;
@@ -182,6 +218,8 @@ int main(int argc, char *argv[]) {
       write(player2_fd, buf, 82);
     }
   }
+  strcpy(t_por,"+----");
+  strcpy(m_por,"|    ");
 
   //---Generate the grids for both players on server
   generateGrid(x,y);
