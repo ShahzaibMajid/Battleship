@@ -22,13 +22,20 @@
 #define MAX_PLAYERS 2 //max num of players
 #define DIM 11 //dimension
 
+int players[MAX_PLAYERS]; //store IP address of player  
+/*Grid Stuff*/
 typedef struct {
   char grid[DIM][DIM]; //11 x 11 grid (actually 10 x 10)
 } Grid;
-
-int players[MAX_PLAYERS];
 Grid pl_1; //grid of player 1
 Grid pl_2; //grid of player 2
+int grid_height;
+int grid_length;
+char t_por[7]; //top portion of the box
+char m_por[7]; //middle portion of the box
+
+/*Grid Stuff Completed*/
+
 
 /*Print out Grid*/
 void printGrid() {
@@ -37,7 +44,7 @@ void printGrid() {
 
   for(i=0;i<DIM;i++) {
     for(j=0;j<DIM;j++) {
-      printf("pl_1.grid[%d][%d] = %d\n",i,j,pl_1.grid[i][j]);
+      printf("pl_1.grid[%d][%d] = %c\n",i,j,pl_1.grid[i][j]);
     }
   }
 }
@@ -76,6 +83,7 @@ void generateGrid(int x, int y) {
       pl_2.grid[x][y] = 'W';
     }
   }
+  printGrid();
 }
 /* Main Controller*/
 int main(int argc, char *argv[]) {
@@ -178,6 +186,6 @@ int main(int argc, char *argv[]) {
   //---Generate the grids for both players on server
   generateGrid(x,y);
   //---Ask players to place ships on grid as chosen
-
+  
   return 0;
 }
