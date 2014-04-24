@@ -30,7 +30,7 @@ typedef struct {
 Grid pl_1; //grid of player 1
 Grid pl_2; //grid of player 2
 int grid_height = 11;
-int grid_length = 11;
+int grid_width = 11;
 char t_por[7]; //top portion of the box
 char m_por[7]; //middle portion of the box
 
@@ -52,14 +52,8 @@ void printGrid() {
     printf("\n");
     for(i = 0; i < grid_width;++i) {
       printf("%s",m_por);
+      printf("%c", pl_1.grid[j][i]);
       if(i == (grid_width-1)) {
-	printf("|");
-      }
-    }
-    printf("\n");
-    for(i = 0; i < gridwidth; ++i) {
-      printf("%s",m_por);
-      if(i == (grid_width -1)) {
 	printf("|");
       }
     }
@@ -115,8 +109,8 @@ void generateGrid(int x, int y) {
   //Set battlefield with (W)ater character
   for(x = 1; x < DIM; x++) {
     for(y = 1; y < DIM; y++) {
-      pl_1.grid[x][y] = 'W'; //W stands for Water
-      pl_2.grid[x][y] = 'W';
+      pl_1.grid[x][y] = 'o'; //W stands for Water
+      pl_2.grid[x][y] = 'o';
     }
   }
   printGrid();
@@ -138,6 +132,8 @@ int main(int argc, char *argv[]) {
   int x = 0; //x coordinate in grid
   int y = 0; //y coordinate in grid
   char buf[8096];
+
+  printf("\n");
   
 /* Establish Server*/
   memset(&hints,0,sizeof(hints));
@@ -196,10 +192,10 @@ int main(int argc, char *argv[]) {
       continue;
     } else {
       --playersNeeded;
-      strncpy(buf, "Battleship Server : Waiting for 1 More Player to Connect...\n", 8095);
-      buf[8096] = '\0';
+      strncpy(buf, "\nBattleship Server : Waiting for 1 More Player to Connect...\n", 8095);
+      buf[8095] = '\0';
       printf("%s", buf);
-      write(player1_fd, buf, 60); 
+      write(player1_fd, buf, 61); 
     }
   }
 
@@ -212,18 +208,19 @@ int main(int argc, char *argv[]) {
     } else {
       --playersNeeded;
       strncpy(buf, "All players connected.\nServer is generating Battlefield grids for both players...\n", 8095);
-      buf[8096]= '\0';
+      buf[8095]= '\0';
       printf("%s", buf);
       write(player1_fd,buf, 82);
       write(player2_fd, buf, 82);
     }
   }
   strcpy(t_por,"+----");
-  strcpy(m_por,"|    ");
+  strcpy(m_por,"|   ");
 
   //---Generate the grids for both players on server
   generateGrid(x,y);
   //---Ask players to place ships on grid as chosen
   
+  printf("\n");
   return 0;
 }
