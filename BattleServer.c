@@ -53,11 +53,26 @@ void generateGrid(int x, int y) {
     pl_2.grid[x][y] =  pos++;
   }
  
-  //Set battlefield to empty characters
-
+  //Set battlefield with (W)ater character
+  for(x = 1; x < DIM; x++) {
+    for(y = 1; y < DIM; y++) {
+      pl_1.grid[x][y] = 'W'; //W stands for Water
+      pl_2.grid[x][y] = 'W';
+    }
+  }
 }
 
+/*Print out Grid*/
+void printGrid() {
 
+  int i,j = 0;
+
+  for(i=0;i<DIM;i++) {
+    for(j=0;j<DIM;j++) {
+      printf("pl_1.grid[%d][%d] = %d\n",i,j,a[i][j]);
+    }
+  }
+}
 /* Update Grid*/
 void updateGrid() {
 
@@ -127,7 +142,7 @@ int main(int argc, char *argv[]) {
     perror("listen");
     exit(1);
   }
-  printf("Battleship Server : Waiting for %d Player(s) to Connect...\n",playersNeeded);
+  printf("Battleship Server : Waiting for 2 More Players to Connect...\n");
 
   /*Get Players*/
   while(playersNeeded != 1) {
@@ -138,7 +153,7 @@ int main(int argc, char *argv[]) {
       continue;
     } else {
       --playersNeeded;
-      strncpy(buf, "Battleship Server : Waiting for 1 more player to connect...\n", 8095);
+      strncpy(buf, "Battleship Server : Waiting for 1 More Player to Connect...\n", 8095);
       buf[8096] = '\0';
       printf("%s", buf);
       write(player1_fd, buf, 60); 
@@ -153,11 +168,11 @@ int main(int argc, char *argv[]) {
       continue;
     } else {
       --playersNeeded;
-      strncpy(buf, "All players connected.\n Server is generating Battlefield grids for both players...\n", 8095);
+      strncpy(buf, "All players connected.\nServer is generating Battlefield grids for both players...\n", 8095);
       buf[8096]= '\0';
       printf("%s", buf);
-      write(player1_fd,buf, 83);
-      write(player2_fd, buf, 83);
+      write(player1_fd,buf, 82);
+      write(player2_fd, buf, 82);
     }
   }
 
