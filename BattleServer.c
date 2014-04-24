@@ -19,9 +19,23 @@
 /* Definitions */
 #define PORT "3369" //port that is used for server and players
 #define MAX_PLAYERS 2 //max num of players
+typedef struct {
 
+} Grid;
 int players[MAX_PLAYERS];
 
+/* Grid Generator*/
+void generateGrid() {
+
+
+}
+
+/* Update Grid*/
+void updateGrid() {
+
+}
+
+/* Main Controller*/
 int main(int argc, char *argv[]) {
 
 /* Variables To Include*/
@@ -35,7 +49,9 @@ int main(int argc, char *argv[]) {
   socklen_t addr_size;
   int yes = 1;
   int playersNeeded = 2;
-
+  int x = 0; //x coordinate in grid
+  int y = 0; //y coordinate in grid
+                                                                   
 /* Establish Server*/
   memset(&hints,0,sizeof(hints));
   hints.ai_family = AF_INET;
@@ -49,7 +65,6 @@ int main(int argc, char *argv[]) {
   
   /* Wait to accept incoming connection*/
   // loop through all results and bind to the first we can
-
   for(res = servinfo; res != NULL; res = res->ai_next) {
     if((sockfd = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol)) == -1) {
       perror("server: socket");
@@ -76,6 +91,9 @@ int main(int argc, char *argv[]) {
 
   freeaddrinfo(servinfo); //all done with servinfo
 
+  /*Server Established */
+
+  /*Begin Queuing Players for Game*/
   if(listen(sockfd,MAX_PLAYERS) == -1) {
     perror("listen");
     exit(1);
@@ -93,5 +111,11 @@ int main(int argc, char *argv[]) {
       printf("Battleship Server : Waiting for %d Player(s) to Connect...\n",--playersNeeded);
     }
   }
-  printf("All players connected...BATTLE!!!\n");
+  printf("All players connected.\n");
+  printf("Server is generating Battlefield grids for both players...\n");
+
+  //---Generate the grids for both players on server
+  generateGrids();
+  //---Ask players to place ships on grid as chosen
+
 }
