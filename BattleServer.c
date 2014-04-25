@@ -21,7 +21,7 @@
 #define PORT "3369" //port that is used for server and players
 #define MAX_PLAYERS 2 //max num of players
 #define DIM 11 //dimension
-#define TOTSHIP 5
+#define TOTSHIP 5 //total number of ships per player
 #define TRUE 1
 #define FALSE 0
 
@@ -37,6 +37,13 @@ int grid_height = 11;
 int grid_width = 11;
 char t_por[7]; //top portion of the box
 char m_por[7]; //middle portion of the box
+typedef struct {
+  char* airLoc[5]; //pointer to location of air carrier
+  char* bsLoc[4]; //pointer to location of battleship
+  char* subLoc[3]; //pointer to location of submarine
+  char* cruLoc[3]; //pointer to location of cruiser
+  char* patLoc[2]; //pointer to location of patrol boat
+} GridLoc;
 /* Grid Stuff Completed*/
 
 /* Ship Stuff*/
