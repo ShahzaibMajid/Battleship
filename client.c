@@ -60,8 +60,13 @@ int main (int argc, char *argv[]) {
 	}
 
 	//Message about placing ships.
+	while ((i = read(sockfd, buf, 8096)) > 0) {
+	  write(1, buf, i);
+        }
 
 	//Messages received during game, stopping when someone wins.
-
+	while ((i = read(sockfd, buf, 8096)) > 0) {
+	  write(1, buf, i);
+        }
 	return 0;
 }

@@ -64,7 +64,8 @@ int numShips1 = 5; //number of ships for player 1
 int numShips2 = 5; //number of ships for player 2
 Ship army1[5]; //army #1 for player 1
 Ship army2[5]; //army #2 for player 2
-
+GridLoc command1; //ship locations of player 1
+GridLoc command2; //ship location of player 2
 /*Set location of ship on grid*/
 void setLocation(int size) {
 
