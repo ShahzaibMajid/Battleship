@@ -25,7 +25,7 @@
 #define TRUE 1
 #define FALSE 0
 
-int players[MAX_PLAYERS]; //store IP address of player  
+int players[MAX_PLAYERS]; //store IP address of player
 int turn = 1; //whose turn is it? (odd for player 1 and even for player 2)
 /* Grid Stuff*/
 typedef struct {
@@ -57,8 +57,8 @@ typedef struct {
      battleship           4
      submarine            3
      cruiser              3
-     patrol boat          2     
-   */ 
+     patrol boat          2
+   */
 } Ship;
 int numShips1 = 5; //number of ships for player 1
 int numShips2 = 5; //number of ships for player 2
@@ -67,7 +67,7 @@ Ship army2[5]; //army #2 for player 2
 
 /*Set location of ship on grid*/
 void setLocation(int size) {
- 
+
 }
 
 /*Position horizontally or vertically*/
@@ -78,7 +78,7 @@ void positionShip(char* type,int size,int player_fd,int playerNum) {
   printf("Player %d is placing %s of size %d...\n",playerNum,type,size);
   //Tell player to choose horizontal or vertical position of ship
   while(ready != TRUE) {
-    
+
 
   }
 }
@@ -111,19 +111,19 @@ void initializeArmies() {
 }
 
 /*Print out Key of Battleship*/
-void printKey() { 
+void printKey() {
   printf("\nBattleship Key :\n");
   printf("S stands for (S)hip\n");
   printf("o stands for (o)pen Waters\n");
   printf("H stands for (H)it\n");
-  printf("M stands for (M)iss\n");
-}  
+  printf("M stands for (M)iss");
+}
 
 /*Print out Grid*/
 void printGrid1() {
 
   int i,j = 0;
- 
+
   printf("\nPlayer 1 Battleship Grid\n");
   for(j = 0; j < grid_height; ++j) {
     for(i = 0; i < grid_width; ++i) {
@@ -205,17 +205,17 @@ void generateGrid(int x, int y) {
   int pos = 48; //first position on grid for row
 
   x = 0;
-  pl_1.grid[0][0] = '#'; //marks no man land coordinate in grid                                  
+  pl_1.grid[0][0] = '#'; //marks no man land coordinate in grid
   pl_2.grid[0][0] = '#';
 
   //Set numbers on columns of the grid (#1-10)
   for(y = 1;y < DIM; y++) {
     pl_1.grid[x][y] = (char)pos;
     pl_2.grid[x][y] = (char)(pos++);
-  }  
+  }
 
   y = 0;
-  //Set Letters A-J on rows of the grid 
+  //Set Letters A-J on rows of the grid
   for(x = 1; x < DIM; x++) {
     pl_1.grid[x][y] =  (char)ascii;
     pl_2.grid[x][y] =  (char)(ascii++);
@@ -252,7 +252,7 @@ int main(int argc, char *argv[]) {
   int playerNum = 1; //are you player x?
 
   printf("\n");
-  
+
 /* Establish Server*/
   memset(&hints,0,sizeof(hints));
   hints.ai_family = AF_INET;
@@ -304,32 +304,32 @@ int main(int argc, char *argv[]) {
   /*Get Players*/
   while(playersNeeded != 1) {
     addr_size = sizeof(player_addr);
-    player1_fd = accept(sockfd,(struct sockaddr *)&player_addr, &addr_size);
+    player1_fd = accept(sockfd, (struct sockaddr *)&player_addr, &addr_size);
     if (player1_fd == -1) {
       perror("Error in Connecting Player to Server");
       continue;
     } else {
       --playersNeeded;
-      strncpy(buf, "Battleship Server : Waiting for 1 More Player to Connect...\n", 8095);
+      strncpy(buf, "\nBattleship Server : Waiting for 1 More Player to Connect...\n", 8095);
       buf[8095] = '\0';
       printf("%s", buf);
-      write(player1_fd, buf, 60); 
+      write(player1_fd, buf, strlen(buf));
     }
   }
 
   while(playersNeeded != 0) {
     addr_size = sizeof(player_addr);
-    player2_fd = accept(sockfd,(struct sockaddr *)&player_addr, &addr_size);
+    player2_fd = accept(sockfd, (struct sockaddr *)&player_addr, &addr_size);
     if (player2_fd == -1) {
       perror("Error in Connecting Player to Server");
       continue;
     } else {
       --playersNeeded;
-      strncpy(buf, "All players connected.\nServer is generating Battlefield grids for both players...\n", 8095);
+      strncpy(buf, "\nAll players connected.\nServer is generating Battlefield grids for both players...\n", 8095);
       buf[8095]= '\0';
       printf("%s", buf);
-      write(player1_fd,buf, 82);
-      write(player2_fd, buf, 82);
+      write(player1_fd, buf, strlen(buf));
+      write(player2_fd, buf, strlen(buf));
     }
   }
   strcpy(t_por,"+----");
@@ -342,41 +342,41 @@ int main(int argc, char *argv[]) {
   printf("\n");
   strncpy(buf,"\nShip sizes and types of both armies are initalized on Server.\nPlease position your army.\n",8095);
   buf[8095] = '\0';
-  printf("%s",buf);
-  write(player1_fd,buf,90);
-  write(player2_fd,buf,90);
-  
+  printf("%s", buf);
+  write(player1_fd, buf, strlen(buf));
+  write(player2_fd, buf, strlen(buf));
+
   //---Tell player 2 to wait while player 1 places his ships
   strncpy(buf,"\nPlease wait while player 1 places his ships.\n",8095);
   buf[8095] = '\0';
-  write(player2_fd,buf,46);
+  write(player2_fd, buf, strlen(buf));
   how = 1; //further sends are disallowed
-  if(shutdown(player2_fd,how) == -1) {
+  if(shutdown(player2_fd, how) == -1) {
     perror("Error in prohibiting player 2 from sending when it is not his turn.");
   }
-  //---Ask player 1 to position each of his ships 
+  //---Ask player 1 to position each of his ships
   while(numShips1 != 0) {
-    for(ship = 0;ship < TOTSHIP;ship++) {
+    for(ship = 0; ship < TOTSHIP; ship++) {
       //start with air carrier and end with patrol boat
-      positionShip(army1[ship].type,army1[ship].size,player1_fd,playerNum);
+      positionShip(army1[ship].type, army1[ship].size, player1_fd, playerNum);
       updateGrid(turn);
       numShips1--;
     }
   }
-  ++turn; //turn is even so its player 2 turn 
+  ++turn; //turn is even so its player 2 turn
   close(player2_fd); //player 2 can now send and receive
-  if(shutdown(player1_fd,how) == -1) { //player 1 must now wait and cannot send to server
+  if(shutdown(player1_fd, how) == -1) { //player 1 must now wait and cannot send to server
     perror("Error in prohibiting player 2 from sending when it is not his turn.");
   }
   strncpy(buf,"\nPlease wait while player 2 places his ships.\n",8095);
   buf[8095] = '\0';
-  write(player2_fd,buf,46);
+  write(player2_fd, buf, strlen(buf));
   playerNum = 2;
   //---Ask player 2 to position each of his ships
   while(numShips2 != 0) {
     for(ship = 0;ship < TOTSHIP;ship++) {
-      //start with air carrier and end with patrol boat 
-      positionShip(army2[ship].type,army2[ship].size,player2_fd,playerNum);
+      //start with air carrier and end with patrol boat
+      positionShip(army2[ship].type, army2[ship].size, player2_fd, playerNum);
       updateGrid(turn);
       numShips1--;
     }
