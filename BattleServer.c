@@ -37,6 +37,7 @@ int grid_height = 11;
 int grid_width = 11;
 char t_por[7]; //top portion of the box
 char m_por[7]; //middle portion of the box
+char buf[8096]; //buffer
 typedef struct {
   char* airLoc[5]; //pointer to location of air carrier
   char* bsLoc[4]; //pointer to location of battleship
@@ -112,95 +113,98 @@ void initializeArmies() {
 }
 
 /*Print out Key of Battleship*/
-void printKey() {
-  printf("\nBattleship Key :\n");
-  printf("S stands for (S)hip\n");
-  printf("o stands for (o)pen Waters\n");
-  printf("H stands for (H)it\n");
-  printf("M stands for (M)iss");
+void printKey(int player1_fd, int player2_fd) {
+  strncpy(buf, "\nBattleship Key :\n", 8095);
+  strncat(buf, "S stands for (S)hip\n", 8095);
+  strncat(buf, "o stands for (o)pen Waters\n", 8095);
+  strncat(buf, "H stands for (H)it\n", 8095);
+  strncat(buf, "M stands for (M)iss\n", 8095);
+
+  write(player1_fd, buf, strlen(buf));
+  write(player2_fd, buf, strlen(buf));
 }
 
 /*Print out Grid*/
-void printGrid1() {
+void printGrid1(int player1_fd) {
 
   int i,j = 0;
 
-  printf("\nPlayer 1 Battleship Grid\n");
+  strncpy(buf, "\nPlayer 1 Battleship Grid\n", 8095);
   for(j = 0; j < grid_height; ++j) {
     for(i = 0; i < grid_width; ++i) {
-      printf("%s",t_por);
+      strncat(buf, t_por, 8095);
       if(i == (grid_width-1)) {
-	printf("+");
+	strncat(buf, "+", 8095);
       }
     }
-    printf("\n");
+    strncat(buf, "\n", 8095);
     for(i = 0; i < grid_width;++i) {
-      printf("%s",m_por);
-      printf("%c", pl_1.grid[j][i]);
+      strncat(buf, m_por, 8095);
+      strncat(buf, &pl_1.grid[j][i], 1);
       if(i == (grid_width-1)) {
-	printf("|");
+	strncat(buf, "|", 8095);
       }
     }
-    printf("\n");
+    strncat(buf, "\n", 8095);
     if (j == (grid_height-1)) {
       for (i=0; i<grid_width; ++i) {
-	printf("%s", t_por);
+	strncat(buf, t_por, 8095);
 	if (i == (grid_width - 1)) {
-	  printf("+");
+	  strncat(buf, "+", 8095);
 	}
       }
     }
   }
-  printf("\n");
-  printKey();
+  strncat(buf, "\n", 8095);
+  write(player1_fd, buf, strlen(buf));
 }
 
-void printGrid2() {
+void printGrid2(int player2_fd) {
 
   int i,j = 0;
 
-  printf("\nPlayer 2 Battleship Grid\n");
+  strncpy(buf,"\nPlayer 2 Battleship Grid\n",8095);
   for(j = 0; j < grid_height; ++j) {
     for(i = 0; i < grid_width; ++i) {
-      printf("%s",t_por);
+      strncat(buf, t_por, 8095);
       if(i == (grid_width-1)) {
-        printf("+");
+        strncat(buf, "+", 8095);
       }
     }
-    printf("\n");
+    strncat(buf, "\n", 8095);
     for(i = 0; i < grid_width;++i) {
-      printf("%s",m_por);
-      printf("%c", pl_1.grid[j][i]);
+      strncat(buf, m_por, 8095);
+      strncat(buf, &pl_2.grid[j][i], 1);
       if(i == (grid_width-1)) {
-        printf("|");
+        strncat(buf, "|", 8095);
       }
     }
-    printf("\n");
+    strncat(buf, "\n", 8095);
     if (j == (grid_height-1)) {
       for (i=0; i<grid_width; ++i) {
-        printf("%s", t_por);
+        strncat(buf, t_por, 8095);
         if (i == (grid_width - 1)) {
-          printf("+");
+          strncat(buf, "+", 8095);
         }
       }
     }
   }
-  printf("\n");
-  printKey();
+  strncat(buf, "\n", 8095);
+  write(player2_fd, buf, strlen(buf));
 }
 
 /* Update Grid*/
-void updateGrid(int turn) {
+void updateGrid(int turn,int player1_fd,int player2_fd) {
 
   if((turn%2) == 1) { //player 1 turn
-    printGrid1();
+    printGrid1(player1_fd);
   } else { //player 2 turn
-    printGrid2();
+    printGrid2(player2_fd);
   }
 }
 
 /* Grid Generator*/
-void generateGrid(int x, int y) {
+void generateGrid(int x, int y, int player1_fd, int player2_fd) {
 
   int ascii = 65; //ascii value of 'A'
   int pos = 48; //first position on grid for row
@@ -229,8 +233,8 @@ void generateGrid(int x, int y) {
       pl_2.grid[x][y] = 'o';
     }
   }
-  printGrid1();
-  printGrid2();
+  printGrid1(player1_fd);
+  printGrid2(player2_fd);
 }
 /* Main Controller*/
 int main(int argc, char *argv[]) {
@@ -337,7 +341,8 @@ int main(int argc, char *argv[]) {
   strcpy(m_por,"|   ");
 
   //---Generate the grids for both players on server
-  generateGrid(x,y);
+  generateGrid(x,y,player1_fd,player2_fd);
+  printKey(player1_fd, player2_fd);
   //---Ask players to place ships on grid as chosen
   initializeArmies(); //initialize armies of two players
   printf("\n");
@@ -357,14 +362,11 @@ int main(int argc, char *argv[]) {
     for(ship = 0; ship < TOTSHIP; ship++) {
       //start with air carrier and end with patrol boat
       positionShip(army1[ship].type, army1[ship].size, player1_fd, playerNum);
-      updateGrid(turn);
+      updateGrid(turn,player1_fd,player2_fd);
       numShips1--;
     }
   }
   ++turn; //turn is even so its player 2 turn
-  if(shutdown(player1_fd, how) == -1) { //player 1 must now wait and cannot send to server
-    perror("Error in prohibiting player 2 from sending when it is not his turn.");
-  }
   strncpy(buf,"\nPlease wait while player 2 places his ships.\n",8095);
   buf[8095] = '\0';
   write(player2_fd, buf, strlen(buf));
@@ -374,7 +376,7 @@ int main(int argc, char *argv[]) {
     for(ship = 0;ship < TOTSHIP;ship++) {
       //start with air carrier and end with patrol boat
       positionShip(army2[ship].type, army2[ship].size, player2_fd, playerNum);
-      updateGrid(turn);
+      updateGrid(turn,player1_fd,player2_fd);
       numShips1--;
     }
   }
