@@ -54,11 +54,14 @@ int main (int argc, char *argv[]) {
 		exit(1);
 	}
 
-//	write(sockfd, "i'm working baybay\n", 19);
-
+	//Initial message when connecting to server.
 	while ((i = read(sockfd, buf, 8096)) > 0) {
 		write(1, buf, i);
 	}
+
+	//Message about placing ships.
+
+	//Messages received during game, stopping when someone wins.
 
 	return 0;
 }
