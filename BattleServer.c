@@ -352,9 +352,6 @@ int main(int argc, char *argv[]) {
   buf[8095] = '\0';
   write(player2_fd, buf, strlen(buf));
   how = 1; //further sends are disallowed
-  if(shutdown(player2_fd, how) == -1) {
-    perror("Error in prohibiting player 2 from sending when it is not his turn.");
-  }
   //---Ask player 1 to position each of his ships
   while(numShips1 != 0) {
     for(ship = 0; ship < TOTSHIP; ship++) {
@@ -365,7 +362,6 @@ int main(int argc, char *argv[]) {
     }
   }
   ++turn; //turn is even so its player 2 turn
-  close(player2_fd); //player 2 can now send and receive
   if(shutdown(player1_fd, how) == -1) { //player 1 must now wait and cannot send to server
     perror("Error in prohibiting player 2 from sending when it is not his turn.");
   }
