@@ -16,6 +16,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <math.h>
 
 /* Definitions */
 #define PORT "3369" //port that is used for server and players
@@ -25,7 +26,7 @@
 #define TRUE 1
 #define FALSE 0
 
-int players[MAX_PLAYERS]; //store IP address of player
+//int players[MAX_PLAYERS]; //store IP address of player
 int turn = 1; //whose turn is it? (odd for player 1 and even for player 2)
 /* Grid Stuff*/
 typedef struct {
@@ -67,22 +68,118 @@ Ship army1[5]; //army #1 for player 1
 Ship army2[5]; //army #2 for player 2
 GridLoc command1; //ship locations of player 1
 GridLoc command2; //ship location of player 2
-/*Set location of ship on grid*/
-void setLocation(int size) {
 
+/*Set location of ship on grid*/
+void setLocation(int size,int orientation,int player_fd,int playerNum) {
+
+  int ready = FALSE;
+  int row,row1,row2;
+  int column,column1,column2 = 0;
+  int j;
+  int temp;
+  int counter;
+
+  while(ready != TRUE) {
+    counter = 0;
+    if(orientation == 0) { //ship is horizontal
+    //Ask for the row and then based on the size of the ship
+    //get the col
+    strncpy(buf,"Horizontal Orientation Selected. Please choose a row from A-J to place ship.",8095);
+    write(player_fd, buf, strlen(buf));
+    read(player_fd, buf, 8095);
+    while((int)(buf[0]) < 64 || (int)(buf[0]) > 75) { //based on ASCII table
+      strncpy(buf,"Incorrect Row entered. Please try again (A-J).\n",8095);
+      write(player_fd, buf, strlen(buf));
+      read(player_fd, buf, 8095);
+    }
+    row = (int)(buf[0])-64;
+    strncpy(buf,"Now, please choose two columns from 0-9 to place ship.\n",8095);
+    write(player_fd, buf, strlen(buf));
+    strncpy(buf,"Enter column number 1.\n",8095);
+    write(player_fd,buf,strlen(buf));
+    read(player_fd, buf, 8095);
+    do {
+      while((int)(buf[0]) < 48 || (int)(buf[0]) > 57) {
+      strncpy(buf,"Entered column number 1 is invalid. Try again.\n",8095);
+      write(player_fd,buf,strlen(buf));
+      read(player_fd, buf, 8095);
+    }
+    column1 = buf[0] - 48;
+    strncpy(buf,"Enter column number 2.\n",8095);
+    write(player_fd,buf,strlen(buf));
+    read(player_fd, buf, 8095);
+    while((int)(buf[0]) < 48 ||(int)(buf[0]) >57) {
+      strncpy(buf,"Entered column number 2 is invalid. Try again.\n",8095);
+      write(player_fd,buf,strlen(buf));
+      read(player_fd, buf, 8095);
+    }
+    column2 = buf[0] - 48;
+    } while(abs(column1-column2) != size-1);
+    //check to finally make sure spaces are 'o'
+    if(playerNum == 1) {
+      if(column2 < column1) {
+        temp = column1;
+        column1 = column2;
+        column2 = temp;
+      }
+      for(j = column1; j <= column2; j++) {
+        if(pl_1.grid[row][j] != 'o') {
+	  break;
+	}
+	counter++;
+      }
+      if(counter == size) {
+        ready = TRUE;
+      }
+    } else {
+      if(column2 < column1) {
+        temp = column1;
+        column1 = column2;
+        column2 = temp;
+	  }
+      for(j = column1; j <= column2; j++) {
+        if(pl_2.grid[row][j] != 'o') {
+          break;
+        }
+        counter++;
+      }
+      if(counter == size) {
+        ready = TRUE;
+      }
+    }
+    } else { //ship is vertical (orient = 1)
+
+    }
+  }
 }
 
 /*Position horizontally or vertically*/
 void positionShip(char* type,int size,int player_fd,int playerNum) {
 
-  int ready = FALSE;
+  int orientation = 2;//vert or horiz
+  char temp[5];
   /*Let server know what ship player must place*/
   printf("Player %d is placing %s of size %d...\n",playerNum,type,size);
   //Tell player to choose horizontal or vertical position of ship
-  while(ready != TRUE) {
 
-
+  while (orientation == 2) {
+    strncpy(buf, "\nThe current ship to set is a(n) ", 8095);
+    strncat(buf, type, 8095);
+    strncat(buf, ", and is ", 8095);
+    sprintf(temp, "%d", size); 
+    strncat(buf, temp, 1);
+    strncat(buf, " units long.\nDo you want to set this ship horizontally or vertically? H for horizontal, V for vertical.\n", 8095); 
+    write(player_fd, buf, strlen(buf));
+    read(player_fd, buf, 8095);
+    if (buf[0] == 'H' || buf[0] == 'h') {
+      orientation = 0;
+      break;
+    } else if (buf[0] != 'V' || buf[0] != 'v') {
+      orientation = 1;
+      break;
+    }
   }
+  setLocation(size,orientation,player_fd,playerNum);
 }
 
 void initializeArmies() {
@@ -155,7 +252,7 @@ void printGrid1(int player1_fd) {
       }
     }
   }
-  strncat(buf, "\n", 8095);
+  strncat(buf, "\n", 8095); printf("%s", buf);
   write(player1_fd, buf, strlen(buf));
 }
 
@@ -371,6 +468,7 @@ int main(int argc, char *argv[]) {
   buf[8095] = '\0';
   write(player2_fd, buf, strlen(buf));
   playerNum = 2;
+
   //---Ask player 2 to position each of his ships
   while(numShips2 != 0) {
     for(ship = 0;ship < TOTSHIP;ship++) {
