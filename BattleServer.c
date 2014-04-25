@@ -129,6 +129,9 @@ void setLocation(int size,int orientation,int player_fd,int playerNum) {
 	counter++;
       }
       if(counter == size) {
+       	for(j = column1; j <= column2; j++) {
+	  pl_2.grid[row][j] = 'S';
+	}
         ready = TRUE;
       }
     } else {
@@ -136,7 +139,7 @@ void setLocation(int size,int orientation,int player_fd,int playerNum) {
         temp = column1;
         column1 = column2;
         column2 = temp;
-	  }
+      }
       for(j = column1; j <= column2; j++) {
         if(pl_2.grid[row][j] != 'o') {
           break;
@@ -144,15 +147,84 @@ void setLocation(int size,int orientation,int player_fd,int playerNum) {
         counter++;
       }
       if(counter == size) {
+        for(j = column1; j <= column2; j++) {
+	  pl_2.grid[row][j] = 'S';
+	}
         ready = TRUE;
       }
     }
     } else { //ship is vertical (orient = 1)
-
+      strncpy(buf,"Vertical Orientation Selected. Please choose a column from 0-9 to place ship.",8095);
+      write(player_fd, buf, strlen(buf));
+      read(player_fd, buf, 8095);
+      while((int)(buf[0]) < 48 || (int)(buf[0]) > 57) { //based on ASCII table       
+	strncpy(buf,"Incorrect Column entered. Please try again (0-9).\n",8095);
+	write(player_fd, buf, strlen(buf));
+	read(player_fd, buf, 8095);
+      }
+      column = (int)(buf[0])-47;
+      strncpy(buf,"Now, please choose two rows from A-J to place ship.\n",8095);
+      write(player_fd, buf, strlen(buf));
+      strncpy(buf,"Enter row 1.\n",8095);
+      write(player_fd,buf,strlen(buf));
+      read(player_fd, buf, 8095);
+      do {
+	while((int)(buf[0]) < 64 || (int)(buf[0]) > 75) {
+	  strncpy(buf,"Entered row number 1 is invalid. Try again.\n",8095);
+	  write(player_fd,buf,strlen(buf));
+	  read(player_fd, buf, 8095);
+	}
+	row1 = buf[0] - 64;
+	strncpy(buf,"Enter row number 2.\n",8095);
+	write(player_fd,buf,strlen(buf));
+	read(player_fd, buf, 8095);
+	while((int)(buf[0]) < 64 ||(int)(buf[0]) > 75) {
+	  strncpy(buf,"Entered row number 2 is invalid. Try again.\n",8095);
+	  write(player_fd,buf,strlen(buf));
+	  read(player_fd, buf, 8095);
+	}
+	row2 = buf[0] - 64;
+      } while(abs(row1-row2) != size-1);
+      if(playerNum == 1) {
+	if(row2 < row1) {
+	  temp = row1;
+	  row1 = row2;
+	  row2 = temp;
+	}
+	for(j = row1; j <= row2; j++) {
+	  if(pl_1.grid[j][column] != 'o') {
+	    break;
+	  }
+	  counter++;
+	}
+	if(counter == size) {
+          for(j = row1; j <= row2; j++) {
+	    pl_1.grid[j][column] = 'S';
+          }
+	  ready = TRUE;
+	}
+      } else {
+	if(row2 < row1) {
+	  temp = row1;
+	  row1 = row2;
+	  row2 = temp;
+	}
+	for(j = row1; j <= row2; j++) {
+	  if(pl_2.grid[j][column] != 'o') {
+	    break;
+	  }
+	  counter++;
+	}
+	if(counter == size) {
+          for(j = row1; j <= row2; j++) {
+            pl_2.grid[j][column] = 'S';
+	  }
+          ready = TRUE;
+	}
+      }
     }
   }
 }
-
 /*Position horizontally or vertically*/
 void positionShip(char* type,int size,int player_fd,int playerNum) {
 
@@ -478,5 +550,7 @@ int main(int argc, char *argv[]) {
       numShips1--;
     }
   }
+
+  
   return 0;
 }
