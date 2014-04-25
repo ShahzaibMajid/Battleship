@@ -69,6 +69,78 @@ Ship army2[5]; //army #2 for player 2
 GridLoc command1; //ship locations of player 1
 GridLoc command2; //ship location of player 2
 
+
+void attack(int player_fd, int playerNum) {
+
+  int done = 0;
+  int row;
+  int column;
+
+  while (done == 0) { 
+    //Get row.
+    strncpy(buf, "Please enter a row, A-J.\n", 8095);
+    write(player_fd, buf, strlen(buf));
+    read(player_fd, buf, 8095);
+    
+    while((int)(buf[0]) < 64 || (int)(buf[0]) > 75) { //based on ASCII table                                                                                                                    
+      strncpy(buf,"Incorrect Row entered. Please try again (A-J).\n", 8095);
+      write(player_fd, buf, strlen(buf));
+      read(player_fd, buf, 8095);
+    }
+    
+    row = (int)(buf[0]) - 64;
+    
+    //Get column.
+    strncpy(buf, "Please enter a column, 0-9.\n", 8095);
+    write(player_fd, buf, strlen(buf));
+    read(player_fd, buf, 8095);
+    
+    while((int)(buf[0]) < 48 || (int)(buf[0]) > 57) { //based on ASCII table                                                                  
+      strncpy(buf,"Incorrect Column entered. Please try again (0-9).\n", 8095);
+      write(player_fd, buf, strlen(buf));
+      read(player_fd, buf, 8095);
+    }
+    
+    //Check if area was already attacked.
+    if (playerNum == 1) {
+      if (pl_2.grid[row][column] == 'H' || pl_2.grid[row][column] == 'M') {
+	strncpy(buf, "You've already attacked this location.\n", 8095);
+	write(player_fd, buf, strlen(buf));
+	read(player_fd, buf, 8095);
+	continue;
+      } else if (pl_2.grid[row][column] == 'o') {
+	pl_2.grid[row][column] = 'M';
+	strncpy(buf, "You have missed the opponent.\n", 8095);
+	write(player_fd, buf, strlen(buf));
+	read(player_fd, buf, 8095);
+      } else if (pl_2.grid[row][column] == 'S') {
+	pl_2.grid[row][column] = 'H';
+	strncpy(buf, "You have hit the opponent!\n", 8095);
+	write(player_fd, buf, strlen(buf));
+	read(player_fd, buf, 8095);
+      }
+    } else {
+      if (pl_1.grid[row][column] == 'H' || pl_1.grid[row][column] == 'M') {
+	strncpy(buf, "You've already attacked this location.\n", 8095);
+	write(player_fd, buf, strlen(buf));
+        read(player_fd, buf, 8095);
+        continue;
+      } else if (pl_1.grid[row][column] == 'o') {
+        pl_1.grid[row][column] = 'M';
+        strncpy(buf, "You have missed the opponent.\n", 8095);
+	write(player_fd, buf, strlen(buf));
+        read(player_fd, buf, 8095);
+      } else if (pl_1.grid[row][column] == 'S') {
+	pl_1.grid[row][column] = 'H';
+        strncpy(buf, "You have hit the opponent!\n", 8095);
+	write(player_fd, buf, strlen(buf));
+        read(player_fd, buf, 8095);
+      }
+    }
+    
+  }
+}
+
 /*Set location of ship on grid*/
 void setLocation(int size,int orientation,int player_fd,int playerNum) {
 
