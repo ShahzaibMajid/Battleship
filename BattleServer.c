@@ -27,7 +27,7 @@
 #define FALSE 0
 
 //int players[MAX_PLAYERS]; //store IP address of player
-int turn = 1; //whose turn is it? (odd for player 1 and even for player 2)
+//int turn = 1; //whose turn is it? (odd for player 1 and even for player 2)
 /* Grid Stuff*/
 typedef struct {
   char grid[DIM][DIM]; //11 x 11 grid (actually 10 x 10)
@@ -39,13 +39,13 @@ int grid_width = 11;
 char t_por[7]; //top portion of the box
 char m_por[7]; //middle portion of the box
 char buf[8096]; //buffer
-typedef struct {
+/*typedef struct {
   char* airLoc[5]; //pointer to location of air carrier
   char* bsLoc[4]; //pointer to location of battleship
   char* subLoc[3]; //pointer to location of submarine
   char* cruLoc[3]; //pointer to location of cruiser
   char* patLoc[2]; //pointer to location of patrol boat
-} GridLoc;
+  } GridLoc;*/
 /* Grid Stuff Completed*/
 
 /* Ship Stuff*/
@@ -66,9 +66,10 @@ int numShips1 = 5; //number of ships for player 1
 int numShips2 = 5; //number of ships for player 2
 Ship army1[5]; //army #1 for player 1
 Ship army2[5]; //army #2 for player 2
-GridLoc command1; //ship locations of player 1
-GridLoc command2; //ship location of player 2
-
+/*GridLoc command1; //ship locations of player 1
+  GridLoc command2; //ship location of player 2*/
+int life1 = 17; //number of S on grid for player 1
+int life2 = 17; //number of S on grid for player 2
 
 void attack(int player_fd, int playerNum) {
 
@@ -82,7 +83,7 @@ void attack(int player_fd, int playerNum) {
     write(player_fd, buf, strlen(buf));
     read(player_fd, buf, 8095);
     
-    while((int)(buf[0]) < 64 || (int)(buf[0]) > 75) { //based on ASCII table                                                                                                                    
+    while((int)(buf[0]) < 64 || (int)(buf[0]) > 75) { //based on ASCII table          
       strncpy(buf,"Incorrect Row entered. Please try again (A-J).\n", 8095);
       write(player_fd, buf, strlen(buf));
       read(player_fd, buf, 8095);
@@ -95,7 +96,7 @@ void attack(int player_fd, int playerNum) {
     write(player_fd, buf, strlen(buf));
     read(player_fd, buf, 8095);
     
-    while((int)(buf[0]) < 48 || (int)(buf[0]) > 57) { //based on ASCII table                                                                  
+    while((int)(buf[0]) < 48 || (int)(buf[0]) > 57) { //based on ASCII table  
       strncpy(buf,"Incorrect Column entered. Please try again (0-9).\n", 8095);
       write(player_fd, buf, strlen(buf));
       read(player_fd, buf, 8095);
@@ -118,6 +119,7 @@ void attack(int player_fd, int playerNum) {
 	strncpy(buf, "You have hit the opponent!\n", 8095);
 	write(player_fd, buf, strlen(buf));
 	read(player_fd, buf, 8095);
+        life2--; //player2 loses one life point
       }
     } else {
       if (pl_1.grid[row][column] == 'H' || pl_1.grid[row][column] == 'M') {
@@ -135,9 +137,9 @@ void attack(int player_fd, int playerNum) {
         strncpy(buf, "You have hit the opponent!\n", 8095);
 	write(player_fd, buf, strlen(buf));
         read(player_fd, buf, 8095);
+        life1--; //player1 loses one life point
       }
-    }
-    
+    }   
   }
 }
 
@@ -305,7 +307,6 @@ void positionShip(char* type,int size,int player_fd,int playerNum) {
   /*Let server know what ship player must place*/
   printf("Player %d is placing %s of size %d...\n",playerNum,type,size);
   //Tell player to choose horizontal or vertical position of ship
-
   while (orientation == 2) {
     strncpy(buf, "\nThe current ship to set is a(n) ", 8095);
     strncat(buf, type, 8095);
@@ -435,9 +436,9 @@ void printGrid2(int player2_fd) {
 }
 
 /* Update Grid*/
-void updateGrid(int turn,int player1_fd,int player2_fd) {
+void updateGrid(int playerNum,int player1_fd,int player2_fd) {
 
-  if((turn%2) == 1) { //player 1 turn
+  if((playerNum) == 1) { //player 1 turn
     printGrid1(player1_fd);
   } else { //player 2 turn
     printGrid2(player2_fd);
@@ -477,6 +478,48 @@ void generateGrid(int x, int y, int player1_fd, int player2_fd) {
   printGrid1(player1_fd);
   printGrid2(player2_fd);
 }
+
+void outcome1(int player1_fd,int player2_fd) {
+  strncpy(buf,"\nYou win!!!\n",8095);
+  buf[8095] = '\0';
+  write(player1_fd,buf,strlen(buf));
+  strncpy(buf,"\nYou lose...\n",8095);
+  buf[8095] = '\0';
+  write(player2_fd,buf,strlen(buf));
+}
+
+void outcome2(int player1_fd, int player2_fd) {
+  strncpy(buf,"\nYou win!!!\n",8095);
+  buf[8095] = '\0';
+  write(player2_fd,buf,strlen(buf));
+  strncpy(buf,"\nYou lose...\n",8095);
+  buf[8095] = '\0';
+  write(player1_fd,buf,strlen(buf));
+}
+
+/*Battle Method where Players Battle*/
+void battle(int playerNum, int player1_fd, int player2_fd) {
+  while(life1 != 0 || life2 != 0) {
+    if(life1 == 0) {
+      outcome2(player1_fd,player2_fd); //player1 loses and player2 wins
+      break;
+    }
+    if(life2 == 0) {
+      outcome1(player1_fd,player2_fd); //player2 loses and player1 wins
+      break;
+    }
+    if(playerNum == 1) {
+      attack(player1_fd,playerNum);
+      updateGrid(playerNum,player1_fd,player2_fd);
+      playerNum = 2;
+    } else {
+      attack(player2_fd,playerNum);
+      updateGrid(playerNum,player1_fd,player2_fd);
+      playerNum = 1;
+    }
+  }
+}
+
 /* Main Controller*/
 int main(int argc, char *argv[]) {
 
@@ -603,26 +646,40 @@ int main(int argc, char *argv[]) {
     for(ship = 0; ship < TOTSHIP; ship++) {
       //start with air carrier and end with patrol boat
       positionShip(army1[ship].type, army1[ship].size, player1_fd, playerNum);
-      updateGrid(turn,player1_fd,player2_fd);
+      updateGrid(playerNum,player1_fd,player2_fd);
       numShips1--;
     }
   }
-  ++turn; //turn is even so its player 2 turn
+  playerNum = 2; //turn is even so its player 2 turn
   strncpy(buf,"\nPlease wait while player 2 places his ships.\n",8095);
   buf[8095] = '\0';
   write(player2_fd, buf, strlen(buf));
   playerNum = 2;
-
   //---Ask player 2 to position each of his ships
   while(numShips2 != 0) {
     for(ship = 0;ship < TOTSHIP;ship++) {
       //start with air carrier and end with patrol boat
       positionShip(army2[ship].type, army2[ship].size, player2_fd, playerNum);
-      updateGrid(turn,player1_fd,player2_fd);
+      updateGrid(playerNum,player1_fd,player2_fd);
       numShips1--;
     }
   }
-
-  
+  strncpy(buf,"\nPlease wait as the Server decides which player goes first. This is a random process\n",8095);
+  write(player1_fd, buf, strlen(buf));
+  write(player2_fd, buf, strlen(buf));
+  playerNum = rand() %2 + 1; //generate either 1 or 2
+  if(playerNum == 1) {
+    strncpy(buf,"Player 1 will go first\n",8095);
+    buf[8095] = '\0';
+    write(player1_fd, buf, strlen(buf));
+    write(player2_fd, buf, strlen(buf));
+    battle(playerNum,player1_fd,player2_fd);
+  } else {
+    strncpy(buf,"Player 2 will go first\n",8095);
+    buf[8095] ='\0';
+    write(player1_fd, buf, strlen(buf));
+    write(player2_fd, buf, strlen(buf));
+    battle(playerNum,player1_fd,player2_fd);
+  }
   return 0;
 }
