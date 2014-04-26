@@ -681,5 +681,8 @@ int main(int argc, char *argv[]) {
     write(player2_fd, buf, strlen(buf));
     battle(playerNum,player1_fd,player2_fd);
   }
+  close(player1_fd);
+  close(player2_fd);
+  close(sockfd);
   return 0;
 }
