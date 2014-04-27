@@ -58,7 +58,15 @@ int main (int argc, char *argv[]) {
 	read(sockfd, buf, 8096);
         printf("%s", buf);
 
-	//Initial grids.
+	//Message letting players know they are connected to an opponent.
+	read(sockfd, buf, 8096);
+        printf("%s", buf);
+        
+        //Message containing the player's initial grid.
+	read(sockfd, buf, 8096);
+        printf("%s", buf);
+        
+        //Message containing the key explaining the grid's symbols.
 	read(sockfd, buf, 8096);
         printf("%s", buf);
 
