@@ -614,6 +614,9 @@ int main(int argc, char *argv[]) {
       continue;
     } else {
       --playersNeeded;
+      strncpy(buf, "\nNow connected to the server.\n", 8095);
+      buf[8095]= '\0';
+      write(player2_fd, buf, strlen(buf));
       strncpy(buf, "\nAll players connected.\nServer is generating Battlefield grids for both players...\n", 8095);
       buf[8095]= '\0';
       printf("%s", buf);
@@ -630,16 +633,16 @@ int main(int argc, char *argv[]) {
   //---Ask players to place ships on grid as chosen
   initializeArmies(); //initialize armies of two players
   printf("\n");
-  strncpy(buf,"\nShip sizes and types of both armies are initalized on Server.\nPlease position your army.\n",8095);
+  strncpy(buf,"\nShip sizes and types of both armies are initalized on Server.\nPlease wait for a notification to position your army.\n",8095);
   buf[8095] = '\0';
   printf("%s", buf);
   write(player1_fd, buf, strlen(buf));
   write(player2_fd, buf, strlen(buf));
 
   //---Tell player 2 to wait while player 1 places his ships
-  strncpy(buf,"\nPlease wait while player 1 places his ships.\n",8095);
+ /* strncpy(buf,"\nPlease wait while player 1 places his ships.\n",8095);
   buf[8095] = '\0';
-  write(player2_fd, buf, strlen(buf));
+  write(player2_fd, buf, strlen(buf));*/
   how = 1; //further sends are disallowed
   //---Ask player 1 to position each of his ships
   while(numShips1 != 0) {
@@ -651,9 +654,9 @@ int main(int argc, char *argv[]) {
     }
   }
   playerNum = 2; //turn is even so its player 2 turn
-  strncpy(buf,"\nPlease wait while player 2 places his ships.\n",8095);
+  /*strncpy(buf,"\nPlease wait while player 2 places his ships.\n",8095);
   buf[8095] = '\0';
-  write(player2_fd, buf, strlen(buf));
+  write(player2_fd, buf, strlen(buf));*/
   playerNum = 2;
   //---Ask player 2 to position each of his ships
   while(numShips2 != 0) {
