@@ -55,18 +55,22 @@ int main (int argc, char *argv[]) {
 	}
 
 	//Initial message when connecting to server.
-	while ((i = read(sockfd, buf, 8096)) > 0) {
-		write(1, buf, i);
-	}
+	read(sockfd, buf, 8096);
+        printf("%s", buf);
 
-	//Message about placing ships.
-	while ((i = read(sockfd, buf, 8096)) > 0) {
-	  write(1, buf, i);
+	//Initial grids.
+	read(sockfd, buf, 8096);
+        printf("%s", buf);
+
+	//Messages about placing ships.
+        for (i = 0; i < 5; i++) {
+	read(sockfd, buf, 8096);
+        printf("%s", buf);
+        scanf("%c", &input);
+        printf("\n%c\n", input);
         }
 
-	//Messages received during game, stopping when someone wins.
-	while ((i = read(sockfd, buf, 8096)) > 0) {
-	  write(1, buf, i);
-        }
+
+	return 0;
 	return 0;
 }
