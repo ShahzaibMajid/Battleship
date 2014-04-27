@@ -2,11 +2,12 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <netdb.h>
+#include <string.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-//hey 
+
 #define MYPORT 3369
 
 int main (int argc, char *argv[]) {
@@ -16,6 +17,7 @@ int main (int argc, char *argv[]) {
 	char arg;
 	char buf[8096];
 	char *address;
+	char input[100];
 	static struct sockaddr_in serv_addr;
 	struct hostent *he;
 
@@ -59,26 +61,89 @@ int main (int argc, char *argv[]) {
         printf("%s", buf);
 
 	//Message letting players know they are connected to an opponent.
+	memset(buf, 0, strlen(buf));
 	read(sockfd, buf, 8096);
         printf("%s", buf);
-        
+
         //Message containing the player's initial grid.
+	memset(buf, 0, strlen(buf));
 	read(sockfd, buf, 8096);
         printf("%s", buf);
-        
+
         //Message containing the key explaining the grid's symbols.
+	memset(buf, 0, strlen(buf));
 	read(sockfd, buf, 8096);
         printf("%s", buf);
 
 	//Messages about placing ships.
         for (i = 0; i < 5; i++) {
-	read(sockfd, buf, 8096);
-        printf("%s", buf);
-        scanf("%c", &input);
-        printf("\n%c\n", input);
+		//Choosing orientation.
+		memset(buf, 0, strlen(buf));
+		read(sockfd, buf, 8096);
+        	printf("%s", buf);
+        	scanf("%s", input);
+		write(sockfd, input, strlen(input));
+
+		//Choosing first row or column.
+		memset(buf, 0, strlen(buf));
+		read(sockfd, buf, 8096);
+		printf("%s", buf);
+		memset(input, 0, strlen(input));
+		scanf("%s", input);
+		write(sockfd, input, strlen(input));
+
+		//Choosing second row or column.
+		memset(buf, 0, strlen(buf));
+		read(sockfd, buf, 8096);
+		printf("%s", buf);
+		memset(input, 0, strlen(input));
+		scanf("%s", input);
+		write(sockfd, input, strlen(input));
+
+		//Choosing third row or column.
+		memset(buf, 0, strlen(buf));
+		read(sockfd, buf, 8096);
+		printf("%s", buf);
+		memset(input, 0, strlen(input));
+		scanf("%s", input);
+		write(sockfd, input, strlen(input));
+
+		//Message containing the player's grid.
+		memset(buf, 0, strlen(buf));
+		read(sockfd, buf, 8096);
+		printf("%s", buf);
         }
 
+	//Main game loop.
+	while (1) {
+		//Enter a row to attack.
+		memset(buf, 0, strlen(buf));
+		read(sockfd, buf, 8096);
+		printf("%s", buf);
+		memset(input, 0, strlen(input));
+		scanf("%s", input);
+		write(sockfd, input, strlen(input));
 
-	return 0;
+		//Enter a column to attack.
+		memset(buf, 0, strlen(buf));
+		read(sockfd, buf, 8096);
+		printf("%s", buf);
+		memset(input, 0, strlen(input));
+		scanf("%s", input);
+		write(sockfd, input, strlen(input));
+
+		//Message about success of attack.
+		memset(buf, 0, strlen(buf));
+		read(sockfd, buf, 8096);
+		printf("%s", buf);
+
+		//Receive updated grid.
+		memset(buf, 0, strlen(buf));
+		read(sockfd, buf, 8096);
+		printf("%s", buf);
+
+		//Gotta figure out how to handle the win condition.
+	}
+
 	return 0;
 }

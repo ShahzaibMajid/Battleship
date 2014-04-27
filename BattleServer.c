@@ -77,48 +77,50 @@ void attack(int player_fd, int playerNum) {
   int row;
   int column;
 
-  while (done == 0) { 
+  while (done == 0) {
     //Get row.
     strncpy(buf, "Please enter a row, A-J.\n", 8095);
     write(player_fd, buf, strlen(buf));
+    memset(buf, 0, strlen(buf));
     read(player_fd, buf, 8095);
-    
-    while((int)(buf[0]) < 64 || (int)(buf[0]) > 75) { //based on ASCII table          
+
+    while((int)(buf[0]) < 64 || (int)(buf[0]) > 75) { //based on ASCII table
       strncpy(buf,"Incorrect Row entered. Please try again (A-J).\n", 8095);
       write(player_fd, buf, strlen(buf));
       read(player_fd, buf, 8095);
     }
-    
+
     row = (int)(buf[0]) - 64;
-    
+
     //Get column.
     strncpy(buf, "Please enter a column, 0-9.\n", 8095);
     write(player_fd, buf, strlen(buf));
+    memset(buf, 0, strlen(buf));
     read(player_fd, buf, 8095);
-    
-    while((int)(buf[0]) < 48 || (int)(buf[0]) > 57) { //based on ASCII table  
+
+    while((int)(buf[0]) < 48 || (int)(buf[0]) > 57) { //based on ASCII table
       strncpy(buf,"Incorrect Column entered. Please try again (0-9).\n", 8095);
       write(player_fd, buf, strlen(buf));
       read(player_fd, buf, 8095);
     }
-    
+
     //Check if area was already attacked.
     if (playerNum == 1) {
       if (pl_2.grid[row][column] == 'H' || pl_2.grid[row][column] == 'M') {
 	strncpy(buf, "You've already attacked this location.\n", 8095);
 	write(player_fd, buf, strlen(buf));
-	read(player_fd, buf, 8095);
+	//read(player_fd, buf, 8095);
 	continue;
       } else if (pl_2.grid[row][column] == 'o') {
 	pl_2.grid[row][column] = 'M';
 	strncpy(buf, "You have missed the opponent.\n", 8095);
 	write(player_fd, buf, strlen(buf));
-	read(player_fd, buf, 8095);
+	//read(player_fd, buf, 8095);
       } else if (pl_2.grid[row][column] == 'S') {
 	pl_2.grid[row][column] = 'H';
 	strncpy(buf, "You have hit the opponent!\n", 8095);
 	write(player_fd, buf, strlen(buf));
-	read(player_fd, buf, 8095);
+	//read(player_fd, buf, 8095);
         life2--; //player2 loses one life point
       }
     } else {
@@ -139,7 +141,7 @@ void attack(int player_fd, int playerNum) {
         read(player_fd, buf, 8095);
         life1--; //player1 loses one life point
       }
-    }   
+    }
   }
 }
 
@@ -158,8 +160,9 @@ void setLocation(int size,int orientation,int player_fd,int playerNum) {
     if(orientation == 0) { //ship is horizontal
     //Ask for the row and then based on the size of the ship
     //get the col
-    strncpy(buf,"Horizontal Orientation Selected. Please choose a row from A-J to place ship.",8095);
+    strncpy(buf,"\nHorizontal Orientation Selected. Please choose a row from A-J to place ship.",8095);
     write(player_fd, buf, strlen(buf));
+    memset(buf, 0, strlen(buf));
     read(player_fd, buf, 8095);
     while((int)(buf[0]) < 64 || (int)(buf[0]) > 75) { //based on ASCII table
       strncpy(buf,"Incorrect Row entered. Please try again (A-J).\n",8095);
@@ -167,10 +170,9 @@ void setLocation(int size,int orientation,int player_fd,int playerNum) {
       read(player_fd, buf, 8095);
     }
     row = (int)(buf[0])-64;
-    strncpy(buf,"Now, please choose two columns from 0-9 to place ship.\n",8095);
-    write(player_fd, buf, strlen(buf));
-    strncpy(buf,"Enter column number 1.\n",8095);
+    strncpy(buf,"Now, please choose two columns from 0-9 to place ship.\n Enter column number 1.\n",8095);
     write(player_fd,buf,strlen(buf));
+    memset(buf, 0, strlen(buf));
     read(player_fd, buf, 8095);
     do {
       while((int)(buf[0]) < 48 || (int)(buf[0]) > 57) {
@@ -181,6 +183,7 @@ void setLocation(int size,int orientation,int player_fd,int playerNum) {
     column1 = buf[0] - 48;
     strncpy(buf,"Enter column number 2.\n",8095);
     write(player_fd,buf,strlen(buf));
+    memset(buf, 0, strlen(buf));
     read(player_fd, buf, 8095);
     while((int)(buf[0]) < 48 ||(int)(buf[0]) >57) {
       strncpy(buf,"Entered column number 2 is invalid. Try again.\n",8095);
@@ -230,17 +233,17 @@ void setLocation(int size,int orientation,int player_fd,int playerNum) {
     } else { //ship is vertical (orient = 1)
       strncpy(buf,"Vertical Orientation Selected. Please choose a column from 0-9 to place ship.",8095);
       write(player_fd, buf, strlen(buf));
+      memset(buf, 0, strlen(buf));
       read(player_fd, buf, 8095);
-      while((int)(buf[0]) < 48 || (int)(buf[0]) > 57) { //based on ASCII table       
+      while((int)(buf[0]) < 48 || (int)(buf[0]) > 57) { //based on ASCII table
 	strncpy(buf,"Incorrect Column entered. Please try again (0-9).\n",8095);
 	write(player_fd, buf, strlen(buf));
 	read(player_fd, buf, 8095);
       }
       column = (int)(buf[0])-47;
-      strncpy(buf,"Now, please choose two rows from A-J to place ship.\n",8095);
-      write(player_fd, buf, strlen(buf));
-      strncpy(buf,"Enter row 1.\n",8095);
+      strncpy(buf,"Now, please choose two rows from A-J to place ship.\nEnter row 1.\n",8095);
       write(player_fd,buf,strlen(buf));
+      memset(buf, 0, strlen(buf));
       read(player_fd, buf, 8095);
       do {
 	while((int)(buf[0]) < 64 || (int)(buf[0]) > 75) {
@@ -251,6 +254,7 @@ void setLocation(int size,int orientation,int player_fd,int playerNum) {
 	row1 = buf[0] - 64;
 	strncpy(buf,"Enter row number 2.\n",8095);
 	write(player_fd,buf,strlen(buf));
+	memset(buf, 0, strlen(buf));
 	read(player_fd, buf, 8095);
 	while((int)(buf[0]) < 64 ||(int)(buf[0]) > 75) {
 	  strncpy(buf,"Entered row number 2 is invalid. Try again.\n",8095);
@@ -308,20 +312,20 @@ void positionShip(char* type,int size,int player_fd,int playerNum) {
   printf("Player %d is placing %s of size %d...\n",playerNum,type,size);
   //Tell player to choose horizontal or vertical position of ship
   while (orientation == 2) {
+    memset(buf, 0, strlen(buf));
     strncpy(buf, "\nThe current ship to set is a(n) ", 8095);
     strncat(buf, type, 8095);
     strncat(buf, ", and is ", 8095);
-    sprintf(temp, "%d", size); 
+    sprintf(temp, "%d", size);
     strncat(buf, temp, 1);
     strncat(buf, " units long.\nDo you want to set this ship horizontally or vertically? H for horizontal, V for vertical.\n", 8095); 
     write(player_fd, buf, strlen(buf));
+    memset(buf, 0, strlen(buf));
     read(player_fd, buf, 8095);
     if (buf[0] == 'H' || buf[0] == 'h') {
       orientation = 0;
-      break;
-    } else if (buf[0] != 'V' || buf[0] != 'v') {
+    } else if (buf[0] == 'V' || buf[0] == 'v') {
       orientation = 1;
-      break;
     }
   }
   setLocation(size,orientation,player_fd,playerNum);
@@ -360,7 +364,7 @@ void printKey(int player1_fd, int player2_fd) {
   strncat(buf, "S stands for (S)hip\n", 8095);
   strncat(buf, "o stands for (o)pen Waters\n", 8095);
   strncat(buf, "H stands for (H)it\n", 8095);
-  strncat(buf, "M stands for (M)iss\n", 8095);
+  strncat(buf, "M stands for (M)iss aaaaaaaaaa\n", 8095);
 
   write(player1_fd, buf, strlen(buf));
   write(player2_fd, buf, strlen(buf));
@@ -614,9 +618,12 @@ int main(int argc, char *argv[]) {
       continue;
     } else {
       --playersNeeded;
+      memset(buf, 0, strlen(buf));
       strncpy(buf, "\nNow connected to the server.\n", 8095);
       buf[8095]= '\0';
       write(player2_fd, buf, strlen(buf));
+
+      memset(buf, 0, strlen(buf));
       strncpy(buf, "\nAll players connected.\nServer is generating Battlefield grids for both players...\n", 8095);
       buf[8095]= '\0';
       printf("%s", buf);
@@ -628,11 +635,14 @@ int main(int argc, char *argv[]) {
   strcpy(m_por,"|   ");
 
   //---Generate the grids for both players on server
+  memset(buf, 0, strlen(buf));
   generateGrid(x,y,player1_fd,player2_fd);
+  memset(buf, 0, strlen(buf));
   printKey(player1_fd, player2_fd);
   //---Ask players to place ships on grid as chosen
   initializeArmies(); //initialize armies of two players
   printf("\n");
+  memset(buf, 0, strlen(buf));
   strncpy(buf,"\nShip sizes and types of both armies are initalized on Server.\nPlease wait for a notification to position your army.\n",8095);
   buf[8095] = '\0';
   printf("%s", buf);
