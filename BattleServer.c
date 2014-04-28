@@ -164,12 +164,16 @@ void setLocation(int size,int orientation,int player_fd,int playerNum) {
     write(player_fd, buf, strlen(buf));
     memset(buf, 0, strlen(buf));
     read(player_fd, buf, 8095);
+    if(((int)buf[0] >= 97) && ((int)buf[0] <= 106)) {
+      buf[0] = (int)buf[0] - 32;
+    }
     while((int)(buf[0]) < 64 || (int)(buf[0]) > 75) { //based on ASCII table
       strncpy(buf,"Incorrect Row entered. Please try again (A-J).\n",8095);
       write(player_fd, buf, strlen(buf));
       read(player_fd, buf, 8095);
     }
     row = (int)(buf[0])-64;
+    printf("\nRow is: %d\n",row);
     strncpy(buf,"\nNow please choose two columns from 0-9 to place ship.\nEnter column 1.\n",8095);
     write(player_fd,buf,strlen(buf));
     memset(buf, 0, strlen(buf));
@@ -180,7 +184,8 @@ void setLocation(int size,int orientation,int player_fd,int playerNum) {
       write(player_fd,buf,strlen(buf));
       read(player_fd, buf, 8095);
     }
-    column1 = buf[0] - 48;
+    column1 = buf[0] - 47;
+    printf("Column 1 is : %d\n",column1);
     strncpy(buf,"\nEnter column number 2.\n",8095);
     write(player_fd,buf,strlen(buf));
     memset(buf, 0, strlen(buf));
@@ -190,7 +195,9 @@ void setLocation(int size,int orientation,int player_fd,int playerNum) {
       write(player_fd,buf,strlen(buf));
       read(player_fd, buf, 8095);
     }
-    column2 = buf[0] - 48;
+    column2 = buf[0] - 47;
+    printf("Column 2 is : %d\n",column2);
+    printf("Dif : %d", abs(column1-column2));
     } while(abs(column1-column2) != size-1);
     //check to finally make sure spaces are 'o'
     if(playerNum == 1) {
@@ -207,7 +214,7 @@ void setLocation(int size,int orientation,int player_fd,int playerNum) {
       }
       if(counter == size) {
        	for(j = column1; j <= column2; j++) {
-	  pl_2.grid[row][j] = 'S';
+	  pl_1.grid[row][j] = 'S';
 	}
         ready = TRUE;
       }
@@ -246,6 +253,9 @@ void setLocation(int size,int orientation,int player_fd,int playerNum) {
       memset(buf, 0, strlen(buf));
       read(player_fd, buf, 8095);
       do {
+	if(((int)buf[0] >= 97) && ((int)buf[0] <= 106)) {
+	  buf[0] =(int)buf[0] - 32;
+	}
 	while((int)(buf[0]) < 64 || (int)(buf[0]) > 75) {
 	  strncpy(buf,"Entered row number 1 is invalid. Try again.\n",8095);
 	  write(player_fd,buf,strlen(buf));
@@ -256,6 +266,9 @@ void setLocation(int size,int orientation,int player_fd,int playerNum) {
 	write(player_fd,buf,strlen(buf));
 	memset(buf, 0, strlen(buf));
 	read(player_fd, buf, 8095);
+	if(((int)buf[0] >= 97) && ((int)buf[0] <= 106)) {
+	  buf[0] =(int)buf[0] - 32;
+	}
 	while((int)(buf[0]) < 64 ||(int)(buf[0]) > 75) {
 	  strncpy(buf,"Entered row number 2 is invalid. Try again.\n",8095);
 	  write(player_fd,buf,strlen(buf));
