@@ -81,7 +81,7 @@ int main (int argc, char *argv[]) {
 	printf("%s", buf);
 
 	//Messages about placing ships.
-//        for (i = 0; i < 5; i++) {
+        for (i = 0; i < 5; i++) {
 		//Choosing orientation.
 		memset(buf, 0, strlen(buf));
 		read(sockfd, buf, 167);
@@ -91,15 +91,15 @@ int main (int argc, char *argv[]) {
 
 		//Choosing first row or column.
 		memset(buf, 0, strlen(buf));
-		read(sockfd, buf, 8096);
+		read(sockfd, buf, 81);
 		printf("%s", buf);
-/*		memset(input, 0, strlen(input));
+		memset(input, 0, strlen(input));
 		scanf("%s", input);
 		write(sockfd, input, strlen(input));
 
 		//Choosing second row or column.
 		memset(buf, 0, strlen(buf));
-		read(sockfd, buf, 8096);
+		read(sockfd, buf, 74);
 		printf("%s", buf);
 		memset(input, 0, strlen(input));
 		scanf("%s", input);
@@ -107,7 +107,7 @@ int main (int argc, char *argv[]) {
 
 		//Choosing third row or column.
 		memset(buf, 0, strlen(buf));
-		read(sockfd, buf, 8096);
+		read(sockfd, buf, 26);
 		printf("%s", buf);
 		memset(input, 0, strlen(input));
 		scanf("%s", input);
@@ -115,15 +115,15 @@ int main (int argc, char *argv[]) {
 
 		//Message containing the player's grid.
 		memset(buf, 0, strlen(buf));
-		read(sockfd, buf, 8096);
+		read(sockfd, buf, 1337);
 		printf("%s", buf);
-        }
+      	}
 
 	//Main game loop.
 	while (1) {
 		//Enter a row to attack.
 		memset(buf, 0, strlen(buf));
-		read(sockfd, buf, 8096);
+		read(sockfd, buf, 26);
 		printf("%s", buf);
 		memset(input, 0, strlen(input));
 		scanf("%s", input);
@@ -131,7 +131,7 @@ int main (int argc, char *argv[]) {
 
 		//Enter a column to attack.
 		memset(buf, 0, strlen(buf));
-		read(sockfd, buf, 8096);
+		read(sockfd, buf, 29);
 		printf("%s", buf);
 		memset(input, 0, strlen(input));
 		scanf("%s", input);
@@ -139,16 +139,16 @@ int main (int argc, char *argv[]) {
 
 		//Message about success of attack.
 		memset(buf, 0, strlen(buf));
-		read(sockfd, buf, 8096);
+		read(sockfd, buf, 48);
 		printf("%s", buf);
 
 		//Receive updated grid.
 		memset(buf, 0, strlen(buf));
-		read(sockfd, buf, 8096);
+		read(sockfd, buf, 1337);
 		printf("%s", buf);
 
 		//Gotta figure out how to handle the win condition.
-	}*/
+	}
 
 	return 0;
 }

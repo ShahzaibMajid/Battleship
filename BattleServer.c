@@ -107,18 +107,18 @@ void attack(int player_fd, int playerNum) {
     //Check if area was already attacked.
     if (playerNum == 1) {
       if (pl_2.grid[row][column] == 'H' || pl_2.grid[row][column] == 'M') {
-	strncpy(buf, "You've already attacked this location.\n", 8095);
+	strncpy(buf, "\nYou have already attacked this location.    \n", 8095);
 	write(player_fd, buf, strlen(buf));
 	//read(player_fd, buf, 8095);
 	continue;
       } else if (pl_2.grid[row][column] == 'o') {
 	pl_2.grid[row][column] = 'M';
-	strncpy(buf, "You have missed the opponent.\n", 8095);
+	strncpy(buf, "\nUnfortunately, you have missed the opponent.\n", 8095);
 	write(player_fd, buf, strlen(buf));
 	//read(player_fd, buf, 8095);
       } else if (pl_2.grid[row][column] == 'S') {
 	pl_2.grid[row][column] = 'H';
-	strncpy(buf, "You have hit the opponent!\n", 8095);
+	strncpy(buf, "\nHooray! You've landed a hit on the opponent!\n", 8095);
 	write(player_fd, buf, strlen(buf));
 	//read(player_fd, buf, 8095);
         life2--; //player2 loses one life point
