@@ -10,6 +10,14 @@
 
 #define MYPORT 3369
 
+void errorHandler(char *buf) {
+	if (strcmp(buf, "\nBad input from player 1. ") == 0 || 
+	    strcmp(buf, "\nBad input from player 2. ") == 0) {
+		printf("Abandoning the game.\n\n");
+		exit(1);
+	}
+}
+
 int main (int argc, char *argv[]) {
 	int i;
 	int win;
@@ -89,6 +97,7 @@ int main (int argc, char *argv[]) {
 		memset(buf, 0, strlen(buf));
 		read(sockfd, buf, 167);
         	printf("%s", buf);
+		errorHandler(buf);
  	      	scanf("%s", input);
 		write(sockfd, input, strlen(input));
 
@@ -96,6 +105,7 @@ int main (int argc, char *argv[]) {
 		memset(buf, 0, strlen(buf));
 		read(sockfd, buf, 81);
 		printf("%s", buf);
+		errorHandler(buf);
 		memset(input, 0, strlen(input));
 		scanf("%s", input);
 		write(sockfd, input, strlen(input));
@@ -104,6 +114,7 @@ int main (int argc, char *argv[]) {
 		memset(buf, 0, strlen(buf));
 		read(sockfd, buf, 74);
 		printf("%s", buf);
+		errorHandler(buf);
 		memset(input, 0, strlen(input));
 		scanf("%s", input);
 		write(sockfd, input, strlen(input));
@@ -112,6 +123,7 @@ int main (int argc, char *argv[]) {
 		memset(buf, 0, strlen(buf));
 		read(sockfd, buf, 26);
 		printf("%s", buf);
+		errorHandler(buf);
 		memset(input, 0, strlen(input));
 		scanf("%s", input);
 		write(sockfd, input, strlen(input));
@@ -120,17 +132,20 @@ int main (int argc, char *argv[]) {
 		memset(buf, 0, strlen(buf));
 		read(sockfd, buf, 1337);
 		printf("%s", buf);
+		errorHandler(buf);
       	}
 
 	//Message about how the server decides who goes first.
 	memset(buf, 0, strlen(buf));
 	read(sockfd, buf, 85);
 	printf("%s", buf);
+	errorHandler(buf);
 
 	//Server letting the players know who is going first.
 	memset(buf, 0, strlen(buf));
 	read(sockfd, buf, 24);
 	printf("%s", buf);
+	errorHandler(buf);
 
 	//Main game loop.
 	while (win != 0) {
@@ -138,6 +153,7 @@ int main (int argc, char *argv[]) {
                 memset(buf, 0, strlen(buf));
                 read(sockfd, buf, 1337);
                 printf("%s", buf);
+		errorHandler(buf);
 
 		if (strcmp(buf, "\nYou lose...\n") == 0) {
 			break;
@@ -147,6 +163,7 @@ int main (int argc, char *argv[]) {
 		memset(buf, 0, strlen(buf));
 		read(sockfd, buf, 26);
 		printf("%s", buf);
+		errorHandler(buf);
 		memset(input, 0, strlen(input));
 		scanf("%s", input);
 		write(sockfd, input, strlen(input));
@@ -155,6 +172,7 @@ int main (int argc, char *argv[]) {
 		memset(buf, 0, strlen(buf));
 		read(sockfd, buf, 29);
 		printf("%s", buf);
+		errorHandler(buf);
 		memset(input, 0, strlen(input));
 		scanf("%s", input);
 		write(sockfd, input, strlen(input));
@@ -163,6 +181,7 @@ int main (int argc, char *argv[]) {
 		memset(buf, 0, strlen(buf));
 		read(sockfd, buf, 48);
 		printf("%s", buf);
+		errorHandler(buf);
 
 		if (strcmp(buf, "\nHooray! You've landed a hit on the opponent!\n") == 0) {
 			win--;

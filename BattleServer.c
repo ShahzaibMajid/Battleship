@@ -60,11 +60,24 @@ Ship army2[5]; //army #2 for player 2
 int life1 = 17; //number of S on grid for player 1
 int life2 = 17; //number of S on grid for player 2
 
-void endGame() {
+void endGame(int player1_fd, int player2_fd, int playerNum, int sockfd) {
+  memset(buf, 0, strlen(buf));
 
-}
+  if (playerNum == 1) {
+    strncpy(buf, "\nBad input from player 1. ", 8095);
+  } else {
+    strncpy(buf, "\nBad input from player 2. ", 8095);
+  }
+  write(player1_fd, buf, strlen(buf));
+  write(player2_fd, buf, strlen(buf));
 
-void attack(int player_fd, int playerNum) {
+  close(sockfd);
+  close(player1_fd);
+  close(player2_fd);
+  exit(1);
+  }
+
+void attack(int player_fd, int playerNum, int other_fd, int sockfd) {
 
   int row;
   int column;
@@ -78,10 +91,9 @@ void attack(int player_fd, int playerNum) {
   if(((int)buf[0] >= 97) && ((int)buf[0] <= 106)) {
     buf[0] = (int)buf[0] - 32;
   }
+
   while((int)(buf[0]) < 64 || (int)(buf[0]) > 75) { //based on ASCII table
-    strncpy(buf,"Incorrect Row entered. Please try again (A-J).\n", 8095);
-    write(player_fd, buf, strlen(buf));
-    read(player_fd, buf, 8095);
+    endGame(player_fd, other_fd, playerNum, sockfd);
   }
   
   row = (int)(buf[0]) - 64;
@@ -93,9 +105,7 @@ void attack(int player_fd, int playerNum) {
   read(player_fd, buf, 8095);
   
   while((int)(buf[0]) < 48 || (int)(buf[0]) > 57) { //based on ASCII table
-    strncpy(buf,"Incorrect Column entered. Please try again (0-9).\n", 8095);
-    write(player_fd, buf, strlen(buf));
-    read(player_fd, buf, 8095);
+    endGame(player_fd, other_fd, playerNum, sockfd);
   }
 
   column = (int)(buf[0]) - 47;
@@ -133,7 +143,7 @@ void attack(int player_fd, int playerNum) {
 }
 
 /*Set location of ship on grid*/
-void setLocation(int size,int orientation,int player_fd,int playerNum) {
+void setLocation(int size,int orientation,int player_fd,int playerNum,int other_fd, int sockfd) {
 
   int ready = FALSE;
   int row,row1,row2;
@@ -151,41 +161,41 @@ void setLocation(int size,int orientation,int player_fd,int playerNum) {
     write(player_fd, buf, strlen(buf));
     memset(buf, 0, strlen(buf));
     read(player_fd, buf, 8095);
+
     if(((int)buf[0] >= 97) && ((int)buf[0] <= 106)) {
       buf[0] = (int)buf[0] - 32;
     }
+
     while((int)(buf[0]) < 64 || (int)(buf[0]) > 75) { //based on ASCII table
-      strncpy(buf,"Incorrect Row entered. Please try again (A-J).\n",8095);
-      write(player_fd, buf, strlen(buf));
-      read(player_fd, buf, 8095);
+      endGame(player_fd, other_fd, playerNum, sockfd);      
     }
+
     row = (int)(buf[0])-64;
     strncpy(buf,"\nNow please choose two columns from 0-9 to place ship.\nEnter column 1.\n",8095);
     write(player_fd,buf,strlen(buf));
     memset(buf, 0, strlen(buf));
     read(player_fd, buf, 8095);
 
-    do {
-      while((int)(buf[0]) < 48 || (int)(buf[0]) > 57) {
-      strncpy(buf,"Entered column number 1 is invalid. Try again.\n",8095);
-      write(player_fd,buf,strlen(buf));
-      read(player_fd, buf, 8095);
-      }
+    if ((int)(buf[0]) < 48 || (int)(buf[0]) > 57) {
+      endGame(player_fd, other_fd, playerNum, sockfd);
+    }
+    
+    column1 = buf[0] - 47;
+    strncpy(buf,"\nEnter column number 2.\n",8095);
+    write(player_fd,buf,strlen(buf));
+    memset(buf, 0, strlen(buf));
+    read(player_fd, buf, 8095);
+    
+    if ((int)(buf[0]) < 48 ||(int)(buf[0]) >57) {
+      endGame(player_fd, other_fd, playerNum, sockfd);
+    }
+    
+    column2 = buf[0] - 47;
 
-      column1 = buf[0] - 47;
-      strncpy(buf,"\nEnter column number 2.\n",8095);
-      write(player_fd,buf,strlen(buf));
-      memset(buf, 0, strlen(buf));
-      read(player_fd, buf, 8095);
-      while((int)(buf[0]) < 48 ||(int)(buf[0]) >57) {
-	strncpy(buf,"Entered column number 2 is invalid. Try again.\n",8095);
-	write(player_fd,buf,strlen(buf));
-	read(player_fd, buf, 8095);
-      }
-
-      column2 = buf[0] - 47;
-    } while(abs(column1-column2) != size-1);
-
+    if (abs(column1-column2) != size-1) {
+      endGame(player_fd, other_fd, playerNum, sockfd);
+    }
+    
     //check to finally make sure spaces are 'o'
     if(playerNum == 1) {
       if(column2 < column1) {
@@ -230,10 +240,8 @@ void setLocation(int size,int orientation,int player_fd,int playerNum) {
       memset(buf, 0, strlen(buf));
       read(player_fd, buf, 8095);
 
-      while((int)(buf[0]) < 48 || (int)(buf[0]) > 57) { //based on ASCII table
-	strncpy(buf,"Incorrect Column entered. Please try again (0-9).\n",8095);
-	write(player_fd, buf, strlen(buf));
-	read(player_fd, buf, 8095);
+      if ((int)(buf[0]) < 48 || (int)(buf[0]) > 57) { //based on ASCII table
+	endGame(player_fd, other_fd, playerNum, sockfd);
       }
 
       column = (int)(buf[0])-47;
@@ -241,32 +249,35 @@ void setLocation(int size,int orientation,int player_fd,int playerNum) {
       write(player_fd,buf,strlen(buf));
       memset(buf, 0, strlen(buf));
       read(player_fd, buf, 8095);
-      do {
-	if(((int)buf[0] >= 97) && ((int)buf[0] <= 106)) {
-	  buf[0] =(int)buf[0] - 32;
-	}
 
-	while((int)(buf[0]) < 64 || (int)(buf[0]) > 75) {
-	  strncpy(buf,"Entered row number 1 is invalid. Try again.\n",8095);
-	  write(player_fd,buf,strlen(buf));
-	  read(player_fd, buf, 8095);
-	}
+      if (((int)buf[0] >= 97) && ((int)buf[0] <= 106)) {
+	buf[0] =(int)buf[0] - 32;
+      }
+      
+      if ((int)(buf[0]) < 64 || (int)(buf[0]) > 75) {
+	endGame(player_fd, other_fd, playerNum, sockfd);
+      }
+      
+      row1 = buf[0] - 64;
+      strncpy(buf,"\nEnter row number 2.   \n",8095);
+      write(player_fd,buf,strlen(buf));
+      memset(buf, 0, strlen(buf));
+      read(player_fd, buf, 8095);
 
-	row1 = buf[0] - 64;
-	strncpy(buf,"\nEnter row number 2.   \n",8095);
-	write(player_fd,buf,strlen(buf));
-	memset(buf, 0, strlen(buf));
-	read(player_fd, buf, 8095);
-	if(((int)buf[0] >= 97) && ((int)buf[0] <= 106)) {
-	  buf[0] =(int)buf[0] - 32;
-	}
-	while((int)(buf[0]) < 64 ||(int)(buf[0]) > 75) {
-	  strncpy(buf,"Entered row number 2 is invalid. Try again.\n",8095);
-	  write(player_fd,buf,strlen(buf));
-	  read(player_fd, buf, 8095);
-	}
-	row2 = buf[0] - 64;
-      } while(abs(row1-row2) != size-1);
+      if(((int)buf[0] >= 97) && ((int)buf[0] <= 106)) {
+	buf[0] =(int)buf[0] - 32;
+      }
+      
+      if ((int)(buf[0]) < 64 ||(int)(buf[0]) > 75) {
+	endGame(player_fd, other_fd, playerNum, sockfd);
+      }
+      
+      row2 = buf[0] - 64;
+      
+      if (abs(row1-row2) != size-1) {
+	endGame(player_fd, other_fd, playerNum, sockfd);
+      }
+  
       if(playerNum == 1) {
 	if(row2 < row1) {
 	  temp = row1;
@@ -308,7 +319,7 @@ void setLocation(int size,int orientation,int player_fd,int playerNum) {
   }
 }
 /*Position horizontally or vertically*/
-void positionShip(char* type,int size,int player_fd,int playerNum) {
+void positionShip(char* type,int size,int player_fd,int playerNum, int other_fd, int sockfd) {
 
   int i;
   int orientation = 2;//vert or horiz
@@ -337,9 +348,11 @@ void positionShip(char* type,int size,int player_fd,int playerNum) {
       orientation = 0;
     } else if (buf[0] == 'V' || buf[0] == 'v') {
       orientation = 1;
+    } else {
+      endGame(player_fd, other_fd, playerNum, sockfd);
     }
   }
-  setLocation(size,orientation,player_fd,playerNum);
+  setLocation(size,orientation,player_fd,playerNum,other_fd,sockfd);
 }
 
 void initializeArmies() {
@@ -533,11 +546,11 @@ void battle(int playerNum, int player1_fd, int player2_fd, int sockfd) {
     }
     if(playerNum == 1) {
       updateGrid(playerNum,player1_fd,player2_fd);
-      attack(player1_fd,playerNum);
+      attack(player1_fd,playerNum,player2_fd,sockfd);
       playerNum = 2;
     } else {
       updateGrid(playerNum,player1_fd,player2_fd);
-      attack(player2_fd,playerNum);
+      attack(player2_fd,playerNum,player1_fd,sockfd);
       playerNum = 1;
     }
   }
@@ -673,7 +686,7 @@ int main(int argc, char *argv[]) {
   while(numShips1 != 0) {
     for(ship = 0; ship < TOTSHIP; ship++) {
       //start with air carrier and end with patrol boat
-      positionShip(army1[ship].type, army1[ship].size, player1_fd, playerNum);
+      positionShip(army1[ship].type, army1[ship].size, player1_fd, playerNum,player2_fd,sockfd);
       updateGrid(playerNum,player1_fd,player2_fd);
       numShips1--;
     }
@@ -685,7 +698,7 @@ int main(int argc, char *argv[]) {
   while(numShips2 != 0) {
     for(ship = 0;ship < TOTSHIP;ship++) {
       //start with air carrier and end with patrol boat
-      positionShip(army2[ship].type, army2[ship].size, player2_fd, playerNum);
+      positionShip(army2[ship].type, army2[ship].size, player2_fd, playerNum,player1_fd,sockfd);
       updateGrid(playerNum,player1_fd,player2_fd);
       numShips2--;
     }
