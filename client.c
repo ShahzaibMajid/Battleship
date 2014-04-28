@@ -57,38 +57,43 @@ int main (int argc, char *argv[]) {
 	}
 
 	//Initial message when connecting to server.
-	read(sockfd, buf, 8096);
+	read(sockfd, buf, 61);
         printf("%s", buf);
 
 	//Message letting players know they are connected to an opponent.
 	memset(buf, 0, strlen(buf));
-	read(sockfd, buf, 8096);
+	read(sockfd, buf, 83);
         printf("%s", buf);
 
         //Message containing the player's initial grid.
 	memset(buf, 0, strlen(buf));
-	read(sockfd, buf, 8096);
+	read(sockfd, buf, 1337);
         printf("%s", buf);
 
         //Message containing the key explaining the grid's symbols.
 	memset(buf, 0, strlen(buf));
-	read(sockfd, buf, 8096);
+	read(sockfd, buf, 104);
         printf("%s", buf);
 
+	//Notification about each player's ships.
+	memset(buf, 0, strlen(buf));
+	read(sockfd, buf, 117);
+	printf("%s", buf);
+
 	//Messages about placing ships.
-        for (i = 0; i < 5; i++) {
+//        for (i = 0; i < 5; i++) {
 		//Choosing orientation.
 		memset(buf, 0, strlen(buf));
-		read(sockfd, buf, 8096);
+		read(sockfd, buf, 167);
         	printf("%s", buf);
-        	scanf("%s", input);
+ 	      	scanf("%s", input);
 		write(sockfd, input, strlen(input));
 
 		//Choosing first row or column.
 		memset(buf, 0, strlen(buf));
 		read(sockfd, buf, 8096);
 		printf("%s", buf);
-		memset(input, 0, strlen(input));
+/*		memset(input, 0, strlen(input));
 		scanf("%s", input);
 		write(sockfd, input, strlen(input));
 
@@ -143,7 +148,7 @@ int main (int argc, char *argv[]) {
 		printf("%s", buf);
 
 		//Gotta figure out how to handle the win condition.
-	}
+	}*/
 
 	return 0;
 }

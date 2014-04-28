@@ -160,7 +160,7 @@ void setLocation(int size,int orientation,int player_fd,int playerNum) {
     if(orientation == 0) { //ship is horizontal
     //Ask for the row and then based on the size of the ship
     //get the col
-    strncpy(buf,"\nHorizontal Orientation Selected. Please choose a row from A-J to place ship.",8095);
+    strncpy(buf,"\nHorizontal Orientation Selected. Please, choose a row from A-J to place ship.\n",8095);
     write(player_fd, buf, strlen(buf));
     memset(buf, 0, strlen(buf));
     read(player_fd, buf, 8095);
@@ -170,7 +170,7 @@ void setLocation(int size,int orientation,int player_fd,int playerNum) {
       read(player_fd, buf, 8095);
     }
     row = (int)(buf[0])-64;
-    strncpy(buf,"Now, please choose two columns from 0-9 to place ship.\n Enter column number 1.\n",8095);
+    strncpy(buf,"\nNow please choose two columns from 0-9 to place ship.\nEnter column 1.\n",8095);
     write(player_fd,buf,strlen(buf));
     memset(buf, 0, strlen(buf));
     read(player_fd, buf, 8095);
@@ -181,7 +181,7 @@ void setLocation(int size,int orientation,int player_fd,int playerNum) {
       read(player_fd, buf, 8095);
     }
     column1 = buf[0] - 48;
-    strncpy(buf,"Enter column number 2.\n",8095);
+    strncpy(buf,"\nEnter column number 2.\n",8095);
     write(player_fd,buf,strlen(buf));
     memset(buf, 0, strlen(buf));
     read(player_fd, buf, 8095);
@@ -231,7 +231,7 @@ void setLocation(int size,int orientation,int player_fd,int playerNum) {
       }
     }
     } else { //ship is vertical (orient = 1)
-      strncpy(buf,"Vertical Orientation Selected. Please choose a column from 0-9 to place ship.",8095);
+      strncpy(buf,"\nVertical Orientation Selected. Please choose a column from 0-9 to place ship.\n",8095);
       write(player_fd, buf, strlen(buf));
       memset(buf, 0, strlen(buf));
       read(player_fd, buf, 8095);
@@ -241,7 +241,7 @@ void setLocation(int size,int orientation,int player_fd,int playerNum) {
 	read(player_fd, buf, 8095);
       }
       column = (int)(buf[0])-47;
-      strncpy(buf,"Now, please choose two rows from A-J to place ship.\nEnter row 1.\n",8095);
+      strncpy(buf,"\nNow, please choose two rows from A-J to place your ship.\nEnter row 1.\n",8095);
       write(player_fd,buf,strlen(buf));
       memset(buf, 0, strlen(buf));
       read(player_fd, buf, 8095);
@@ -252,7 +252,7 @@ void setLocation(int size,int orientation,int player_fd,int playerNum) {
 	  read(player_fd, buf, 8095);
 	}
 	row1 = buf[0] - 64;
-	strncpy(buf,"Enter row number 2.\n",8095);
+	strncpy(buf,"\nEnter row number 2.   \n",8095);
 	write(player_fd,buf,strlen(buf));
 	memset(buf, 0, strlen(buf));
 	read(player_fd, buf, 8095);
@@ -306,6 +306,7 @@ void setLocation(int size,int orientation,int player_fd,int playerNum) {
 /*Position horizontally or vertically*/
 void positionShip(char* type,int size,int player_fd,int playerNum) {
 
+  int i;
   int orientation = 2;//vert or horiz
   char temp[5];
   /*Let server know what ship player must place*/
@@ -318,7 +319,13 @@ void positionShip(char* type,int size,int player_fd,int playerNum) {
     strncat(buf, ", and is ", 8095);
     sprintf(temp, "%d", size);
     strncat(buf, temp, 1);
-    strncat(buf, " units long.\nDo you want to set this ship horizontally or vertically? H for horizontal, V for vertical.\n", 8095); 
+    strncat(buf, " units long.\n\nDo you want to set this ship horizontally or vertically?\nH for horizontal, V for vertical.", 8095);
+
+    for (i = strlen(type); i < 16; i++) {
+	strncat(buf, " ", 8095);
+    }
+
+    strncat(buf, "\n", 8095);
     write(player_fd, buf, strlen(buf));
     memset(buf, 0, strlen(buf));
     read(player_fd, buf, 8095);
@@ -364,7 +371,7 @@ void printKey(int player1_fd, int player2_fd) {
   strncat(buf, "S stands for (S)hip\n", 8095);
   strncat(buf, "o stands for (o)pen Waters\n", 8095);
   strncat(buf, "H stands for (H)it\n", 8095);
-  strncat(buf, "M stands for (M)iss aaaaaaaaaa\n", 8095);
+  strncat(buf, "M stands for (M)iss\n", 8095);
 
   write(player1_fd, buf, strlen(buf));
   write(player2_fd, buf, strlen(buf));
@@ -619,7 +626,7 @@ int main(int argc, char *argv[]) {
     } else {
       --playersNeeded;
       memset(buf, 0, strlen(buf));
-      strncpy(buf, "\nNow connected to the server.\n", 8095);
+      strncpy(buf, "\nBattleship Server : Now, you are connected to the server...\n", 8095);
       buf[8095]= '\0';
       write(player2_fd, buf, strlen(buf));
 
