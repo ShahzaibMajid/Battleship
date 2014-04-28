@@ -26,9 +26,7 @@
 #define TRUE 1
 #define FALSE 0
 
-//int players[MAX_PLAYERS]; //store IP address of player
-//int turn = 1; //whose turn is it? (odd for player 1 and even for player 2)
-/* Grid Stuff*/
+/* Grid studd */
 typedef struct {
   char grid[DIM][DIM]; //11 x 11 grid (actually 10 x 10)
 } Grid;
@@ -39,14 +37,6 @@ int grid_width = 11;
 char t_por[7]; //top portion of the box
 char m_por[7]; //middle portion of the box
 char buf[8096]; //buffer
-/*typedef struct {
-  char* airLoc[5]; //pointer to location of air carrier
-  char* bsLoc[4]; //pointer to location of battleship
-  char* subLoc[3]; //pointer to location of submarine
-  char* cruLoc[3]; //pointer to location of cruiser
-  char* patLoc[2]; //pointer to location of patrol boat
-  } GridLoc;*/
-/* Grid Stuff Completed*/
 
 /* Ship Stuff*/
 typedef struct {
@@ -62,12 +52,11 @@ typedef struct {
      patrol boat          2
    */
 } Ship;
+
 int numShips1 = 5; //number of ships for player 1
 int numShips2 = 5; //number of ships for player 2
 Ship army1[5]; //army #1 for player 1
 Ship army2[5]; //army #2 for player 2
-/*GridLoc command1; //ship locations of player 1
-  GridLoc command2; //ship location of player 2*/
 int life1 = 17; //number of S on grid for player 1
 int life2 = 17; //number of S on grid for player 2
 
@@ -76,7 +65,7 @@ void attack(int player_fd, int playerNum) {
   int row;
   int column;
 
-    //Get row.
+  //Get row.
   strncpy(buf, "Please enter a row, A-J.\n", 8095);
   write(player_fd, buf, strlen(buf));
   memset(buf, 0, strlen(buf));
@@ -92,8 +81,7 @@ void attack(int player_fd, int playerNum) {
   }
   
   row = (int)(buf[0]) - 64;
-  printf("Player number is : %d", playerNum);
-  printf("Row is : %d\n",row);
+  
   //Get column.
   strncpy(buf, "Please enter a column, 0-9.\n", 8095);
   write(player_fd, buf, strlen(buf));
@@ -105,41 +93,36 @@ void attack(int player_fd, int playerNum) {
     write(player_fd, buf, strlen(buf));
     read(player_fd, buf, 8095);
   }
+
   column = (int)(buf[0]) - 47;
-  printf("Column is : %d\n",column);
+
   //Check if area was already attacked.
   if (playerNum == 1) {
     if (pl_2.grid[row][column] == 'H' || pl_2.grid[row][column] == 'M') {
       strncpy(buf, "\nYou have already attacked this location.    \n", 8095);
       write(player_fd, buf, strlen(buf));
-      //read(player_fd, buf, 8095);
     } else if (pl_2.grid[row][column] == 'o') {
       pl_2.grid[row][column] = 'M';
       strncpy(buf, "\nUnfortunately, you have missed the opponent.\n", 8095);
       write(player_fd, buf, strlen(buf));
-      //read(player_fd, buf, 8095);
     } else if (pl_2.grid[row][column] == 'S') {
       pl_2.grid[row][column] = 'H';
       strncpy(buf, "\nHooray! You've landed a hit on the opponent!\n", 8095);
       write(player_fd, buf, strlen(buf));
-      //read(player_fd, buf, 8095);
       life2--; //player2 loses one life point
     }
   } else {
     if (pl_1.grid[row][column] == 'H' || pl_1.grid[row][column] == 'M') {
       strncpy(buf, "You've already attacked this location.\n", 8095);
       write(player_fd, buf, strlen(buf));
-      //read(player_fd, buf, 8095);
     } else if (pl_1.grid[row][column] == 'o') {
       pl_1.grid[row][column] = 'M';
       strncpy(buf, "You have missed the opponent.\n", 8095);
       write(player_fd, buf, strlen(buf));
-      //read(player_fd, buf, 8095);
     } else if (pl_1.grid[row][column] == 'S') {
       pl_1.grid[row][column] = 'H';
       strncpy(buf, "You have hit the opponent!\n", 8095);
       write(player_fd, buf, strlen(buf));
-      //read(player_fd, buf, 8095);
       life1--; //player1 loses one life point
     }
   }
@@ -173,32 +156,32 @@ void setLocation(int size,int orientation,int player_fd,int playerNum) {
       read(player_fd, buf, 8095);
     }
     row = (int)(buf[0])-64;
-    printf("\nRow is: %d\n",row);
     strncpy(buf,"\nNow please choose two columns from 0-9 to place ship.\nEnter column 1.\n",8095);
     write(player_fd,buf,strlen(buf));
     memset(buf, 0, strlen(buf));
     read(player_fd, buf, 8095);
+
     do {
       while((int)(buf[0]) < 48 || (int)(buf[0]) > 57) {
       strncpy(buf,"Entered column number 1 is invalid. Try again.\n",8095);
       write(player_fd,buf,strlen(buf));
       read(player_fd, buf, 8095);
-    }
-    column1 = buf[0] - 47;
-    printf("Column 1 is : %d\n",column1);
-    strncpy(buf,"\nEnter column number 2.\n",8095);
-    write(player_fd,buf,strlen(buf));
-    memset(buf, 0, strlen(buf));
-    read(player_fd, buf, 8095);
-    while((int)(buf[0]) < 48 ||(int)(buf[0]) >57) {
-      strncpy(buf,"Entered column number 2 is invalid. Try again.\n",8095);
+      }
+
+      column1 = buf[0] - 47;
+      strncpy(buf,"\nEnter column number 2.\n",8095);
       write(player_fd,buf,strlen(buf));
+      memset(buf, 0, strlen(buf));
       read(player_fd, buf, 8095);
-    }
-    column2 = buf[0] - 47;
-    printf("Column 2 is : %d\n",column2);
-    printf("Dif : %d", abs(column1-column2));
+      while((int)(buf[0]) < 48 ||(int)(buf[0]) >57) {
+	strncpy(buf,"Entered column number 2 is invalid. Try again.\n",8095);
+	write(player_fd,buf,strlen(buf));
+	read(player_fd, buf, 8095);
+      }
+
+      column2 = buf[0] - 47;
     } while(abs(column1-column2) != size-1);
+
     //check to finally make sure spaces are 'o'
     if(playerNum == 1) {
       if(column2 < column1) {
@@ -242,11 +225,13 @@ void setLocation(int size,int orientation,int player_fd,int playerNum) {
       write(player_fd, buf, strlen(buf));
       memset(buf, 0, strlen(buf));
       read(player_fd, buf, 8095);
+
       while((int)(buf[0]) < 48 || (int)(buf[0]) > 57) { //based on ASCII table
 	strncpy(buf,"Incorrect Column entered. Please try again (0-9).\n",8095);
 	write(player_fd, buf, strlen(buf));
 	read(player_fd, buf, 8095);
       }
+
       column = (int)(buf[0])-47;
       strncpy(buf,"\nNow, please choose two rows from A-J to place your ship.\nEnter row 1.\n",8095);
       write(player_fd,buf,strlen(buf));
@@ -256,11 +241,13 @@ void setLocation(int size,int orientation,int player_fd,int playerNum) {
 	if(((int)buf[0] >= 97) && ((int)buf[0] <= 106)) {
 	  buf[0] =(int)buf[0] - 32;
 	}
+
 	while((int)(buf[0]) < 64 || (int)(buf[0]) > 75) {
 	  strncpy(buf,"Entered row number 1 is invalid. Try again.\n",8095);
 	  write(player_fd,buf,strlen(buf));
 	  read(player_fd, buf, 8095);
 	}
+
 	row1 = buf[0] - 64;
 	strncpy(buf,"\nEnter row number 2.   \n",8095);
 	write(player_fd,buf,strlen(buf));
@@ -421,7 +408,7 @@ void printGrid1(int player1_fd) {
       }
     }
   }
-  strncat(buf, "\n", 8095); printf("%s", buf);
+  strncat(buf, "\n", 8095);
   write(player1_fd, buf, strlen(buf));
 }
 
@@ -469,15 +456,6 @@ void updateGrid(int playerNum,int player1_fd,int player2_fd) {
   }
 }
 
-void updateGrid2(int playerNum,int player1_fd,int player2_fd) {
-
-  if((playerNum) == 1) { //player 1 turn
-    printGrid2(player2_fd);
-  } else { //player 2 turn 
-    printGrid1(player1_fd);
-  }
-}
-
 /* Grid Generator*/
 void generateGrid(int x, int y, int player1_fd, int player2_fd) {
 
@@ -512,33 +490,45 @@ void generateGrid(int x, int y, int player1_fd, int player2_fd) {
   printGrid2(player2_fd);
 }
 
-void outcome1(int player1_fd,int player2_fd) {
+void outcome1(int player1_fd,int player2_fd, int sockfd) {
   strncpy(buf,"\nYou win!!!\n",8095);
   buf[8095] = '\0';
   write(player1_fd,buf,strlen(buf));
   strncpy(buf,"\nYou lose...\n",8095);
   buf[8095] = '\0';
   write(player2_fd,buf,strlen(buf));
+  close(sockfd);
+  shutdown(player1_fd,1);
+  shutdown(player2_fd,1);
+  close(player1_fd);
+  close(player2_fd); 
+  exit(1);
 }
 
-void outcome2(int player1_fd, int player2_fd) {
+void outcome2(int player1_fd, int player2_fd, int sockfd) {
   strncpy(buf,"\nYou win!!!\n",8095);
   buf[8095] = '\0';
   write(player2_fd,buf,strlen(buf));
   strncpy(buf,"\nYou lose...\n",8095);
   buf[8095] = '\0';
   write(player1_fd,buf,strlen(buf));
+  close(sockfd);
+  shutdown(player1_fd,1);
+  shutdown(player2_fd,1);
+  close(player1_fd);
+  close(player2_fd);
+  exit(1);
 }
 
 /*Battle Method where Players Battle*/
-void battle(int playerNum, int player1_fd, int player2_fd) {
+void battle(int playerNum, int player1_fd, int player2_fd, int sockfd) {
   while(life1 != 0 || life2 != 0) {
     if(life1 == 0) {
-      outcome2(player1_fd,player2_fd); //player1 loses and player2 wins
+      outcome2(player1_fd,player2_fd,sockfd); //player1 loses and player2 wins
       break;
     }
     if(life2 == 0) {
-      outcome1(player1_fd,player2_fd); //player2 loses and player1 wins
+      outcome1(player1_fd,player2_fd,sockfd); //player2 loses and player1 wins
       break;
     }
     if(playerNum == 1) {
@@ -660,6 +650,7 @@ int main(int argc, char *argv[]) {
       write(player2_fd, buf, strlen(buf));
     }
   }
+
   strcpy(t_por,"+----");
   strcpy(m_por,"|   ");
 
@@ -678,11 +669,6 @@ int main(int argc, char *argv[]) {
   write(player1_fd, buf, strlen(buf));
   write(player2_fd, buf, strlen(buf));
 
-  //---Tell player 2 to wait while player 1 places his ships
- /* strncpy(buf,"\nPlease wait while player 1 places his ships.\n",8095);
-  buf[8095] = '\0';
-  write(player2_fd, buf, strlen(buf));*/
-  how = 1; //further sends are disallowed
   //---Ask player 1 to position each of his ships
   while(numShips1 != 0) {
     for(ship = 0; ship < TOTSHIP; ship++) {
@@ -692,11 +678,9 @@ int main(int argc, char *argv[]) {
       numShips1--;
     }
   }
+
   playerNum = 2; //turn is even so its player 2 turn
-  /*strncpy(buf,"\nPlease wait while player 2 places his ships.\n",8095);
-  buf[8095] = '\0';
-  write(player2_fd, buf, strlen(buf));*/
-  playerNum = 2;
+
   //---Ask player 2 to position each of his ships
   while(numShips2 != 0) {
     for(ship = 0;ship < TOTSHIP;ship++) {
@@ -706,23 +690,26 @@ int main(int argc, char *argv[]) {
       numShips2--;
     }
   }
+
   strncpy(buf,"\nPlease wait as the Server decides which player goes first. This is a random process\n",8095);
   write(player1_fd, buf, strlen(buf));
   write(player2_fd, buf, strlen(buf));
   playerNum = rand() %2 + 1; //generate either 1 or 2
+
   if(playerNum == 1) {
-    strncpy(buf,"Player 1 will go first\n",8095);
+    strncpy(buf,"Player 1 will go first.\n",8095);
     buf[8095] = '\0';
     write(player1_fd, buf, strlen(buf));
     write(player2_fd, buf, strlen(buf));
-    battle(playerNum,player1_fd,player2_fd);
+    battle(playerNum,player1_fd,player2_fd,sockfd);
   } else {
-    strncpy(buf,"Player 2 will go first\n",8095);
+    strncpy(buf,"Player 2 will go first.\n",8095);
     buf[8095] ='\0';
     write(player1_fd, buf, strlen(buf));
     write(player2_fd, buf, strlen(buf));
-    battle(playerNum,player1_fd,player2_fd);
+    battle(playerNum,player1_fd,player2_fd,sockfd);
   }
+
   close(player1_fd);
   close(player2_fd);
   close(sockfd);

@@ -126,7 +126,7 @@ int main (int argc, char *argv[]) {
 
 	//Server letting the players know who is going first.
 	memset(buf, 0, strlen(buf));
-	read(sockfd, buf, 23);
+	read(sockfd, buf, 24);
 	printf("%s", buf);
 
 	//Main game loop.
@@ -156,8 +156,6 @@ int main (int argc, char *argv[]) {
 		memset(buf, 0, strlen(buf));
 		read(sockfd, buf, 48);
 		printf("%s", buf);
-
-		//Gotta figure out how to handle the win condition.
 	}
 
 	return 0;
