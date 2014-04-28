@@ -60,6 +60,10 @@ Ship army2[5]; //army #2 for player 2
 int life1 = 17; //number of S on grid for player 1
 int life2 = 17; //number of S on grid for player 2
 
+void endGame() {
+
+}
+
 void attack(int player_fd, int playerNum) {
 
   int row;
@@ -113,15 +117,15 @@ void attack(int player_fd, int playerNum) {
     }
   } else {
     if (pl_1.grid[row][column] == 'H' || pl_1.grid[row][column] == 'M') {
-      strncpy(buf, "You've already attacked this location.\n", 8095);
+      strncpy(buf,"\nYou have already attacked this location.    \n", 8095);
       write(player_fd, buf, strlen(buf));
     } else if (pl_1.grid[row][column] == 'o') {
       pl_1.grid[row][column] = 'M';
-      strncpy(buf, "You have missed the opponent.\n", 8095);
+      strncpy(buf,"\nUnfortunately, you have missed the opponent.\n", 8095);
       write(player_fd, buf, strlen(buf));
     } else if (pl_1.grid[row][column] == 'S') {
       pl_1.grid[row][column] = 'H';
-      strncpy(buf, "You have hit the opponent!\n", 8095);
+      strncpy(buf,"\nHooray! You've landed a hit on the opponent!\n", 8095);
       write(player_fd, buf, strlen(buf));
       life1--; //player1 loses one life point
     }
@@ -498,8 +502,6 @@ void outcome1(int player1_fd,int player2_fd, int sockfd) {
   buf[8095] = '\0';
   write(player2_fd,buf,strlen(buf));
   close(sockfd);
-  shutdown(player1_fd,1);
-  shutdown(player2_fd,1);
   close(player1_fd);
   close(player2_fd); 
   exit(1);
@@ -513,8 +515,6 @@ void outcome2(int player1_fd, int player2_fd, int sockfd) {
   buf[8095] = '\0';
   write(player1_fd,buf,strlen(buf));
   close(sockfd);
-  shutdown(player1_fd,1);
-  shutdown(player2_fd,1);
   close(player1_fd);
   close(player2_fd);
   exit(1);

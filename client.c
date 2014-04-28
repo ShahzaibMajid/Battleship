@@ -12,6 +12,7 @@
 
 int main (int argc, char *argv[]) {
 	int i;
+	int win;
 	int port;
 	int sockfd;
 	char arg;
@@ -20,6 +21,8 @@ int main (int argc, char *argv[]) {
 	char input[100];
 	static struct sockaddr_in serv_addr;
 	struct hostent *he;
+
+	win = 17;
 
 	if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
 		perror("socket");
@@ -130,11 +133,15 @@ int main (int argc, char *argv[]) {
 	printf("%s", buf);
 
 	//Main game loop.
-	while (1) {
+	while (win != 0) {
 		//Receive your grid.
                 memset(buf, 0, strlen(buf));
                 read(sockfd, buf, 1337);
                 printf("%s", buf);
+
+		if (strcmp(buf, "\nYou lose...\n") == 0) {
+			break;
+		}
 
 		//Enter a row to attack.
 		memset(buf, 0, strlen(buf));
@@ -156,7 +163,14 @@ int main (int argc, char *argv[]) {
 		memset(buf, 0, strlen(buf));
 		read(sockfd, buf, 48);
 		printf("%s", buf);
+
+		if (strcmp(buf, "\nHooray! You've landed a hit on the opponent!\n") == 0) {
+			win--;
+		}
 	}
 
+	if (win == 0) {
+		printf("\nYou win!!!\n");
+	}
 	return 0;
 }
