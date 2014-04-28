@@ -119,6 +119,16 @@ int main (int argc, char *argv[]) {
 		printf("%s", buf);
       	}
 
+	//Message about how the server decides who goes first.
+	memset(buf, 0, strlen(buf));
+	read(sockfd, buf, 87);
+	printf("%s", buf);
+
+	//Server letting the players know who is going first.
+	memset(buf, 0, strlen(buf));
+	read(sockfd, buf, 24);
+	printf("%s", buf);
+
 	//Main game loop.
 	while (1) {
 		//Receive your grid.
