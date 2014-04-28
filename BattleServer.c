@@ -73,75 +73,74 @@ int life2 = 17; //number of S on grid for player 2
 
 void attack(int player_fd, int playerNum) {
 
-  int done = 0;
   int row;
   int column;
 
-  while (done == 0) {
     //Get row.
-    strncpy(buf, "Please enter a row, A-J.\n", 8095);
+  strncpy(buf, "Please enter a row, A-J.\n", 8095);
+  write(player_fd, buf, strlen(buf));
+  memset(buf, 0, strlen(buf));
+  read(player_fd, buf, 8095);
+  
+  if(((int)buf[0] >= 97) && ((int)buf[0] <= 106)) {
+    buf[0] = (int)buf[0] - 32;
+  }
+  while((int)(buf[0]) < 64 || (int)(buf[0]) > 75) { //based on ASCII table
+    strncpy(buf,"Incorrect Row entered. Please try again (A-J).\n", 8095);
     write(player_fd, buf, strlen(buf));
-    memset(buf, 0, strlen(buf));
     read(player_fd, buf, 8095);
-    
-    if(((int)buf[0] >= 97) && ((int)buf[0] <= 106)) {
-      buf[0] = (int)buf[0] - 32;
-    }
-    while((int)(buf[0]) < 64 || (int)(buf[0]) > 75) { //based on ASCII table
-      strncpy(buf,"Incorrect Row entered. Please try again (A-J).\n", 8095);
-      write(player_fd, buf, strlen(buf));
-      read(player_fd, buf, 8095);
-    }
-
-    row = (int)(buf[0]) - 64;
-
-    //Get column.
-    strncpy(buf, "Please enter a column, 0-9.\n", 8095);
+  }
+  
+  row = (int)(buf[0]) - 64;
+  printf("Player number is : %d", playerNum);
+  printf("Row is : %d\n",row);
+  //Get column.
+  strncpy(buf, "Please enter a column, 0-9.\n", 8095);
+  write(player_fd, buf, strlen(buf));
+  memset(buf, 0, strlen(buf));
+  read(player_fd, buf, 8095);
+  
+  while((int)(buf[0]) < 48 || (int)(buf[0]) > 57) { //based on ASCII table
+    strncpy(buf,"Incorrect Column entered. Please try again (0-9).\n", 8095);
     write(player_fd, buf, strlen(buf));
-    memset(buf, 0, strlen(buf));
     read(player_fd, buf, 8095);
-
-    while((int)(buf[0]) < 48 || (int)(buf[0]) > 57) { //based on ASCII table
-      strncpy(buf,"Incorrect Column entered. Please try again (0-9).\n", 8095);
+  }
+  column = (int)(buf[0]) - 47;
+  printf("Column is : %d\n",column);
+  //Check if area was already attacked.
+  if (playerNum == 1) {
+    if (pl_2.grid[row][column] == 'H' || pl_2.grid[row][column] == 'M') {
+      strncpy(buf, "\nYou have already attacked this location.    \n", 8095);
       write(player_fd, buf, strlen(buf));
-      read(player_fd, buf, 8095);
+      //read(player_fd, buf, 8095);
+    } else if (pl_2.grid[row][column] == 'o') {
+      pl_2.grid[row][column] = 'M';
+      strncpy(buf, "\nUnfortunately, you have missed the opponent.\n", 8095);
+      write(player_fd, buf, strlen(buf));
+      //read(player_fd, buf, 8095);
+    } else if (pl_2.grid[row][column] == 'S') {
+      pl_2.grid[row][column] = 'H';
+      strncpy(buf, "\nHooray! You've landed a hit on the opponent!\n", 8095);
+      write(player_fd, buf, strlen(buf));
+      //read(player_fd, buf, 8095);
+      life2--; //player2 loses one life point
     }
-
-    //Check if area was already attacked.
-    if (playerNum == 1) {
-      if (pl_2.grid[row][column] == 'H' || pl_2.grid[row][column] == 'M') {
-	strncpy(buf, "\nYou have already attacked this location.    \n", 8095);
-	write(player_fd, buf, strlen(buf));
-	//read(player_fd, buf, 8095);
-      } else if (pl_2.grid[row][column] == 'o') {
-	pl_2.grid[row][column] = 'M';
-	strncpy(buf, "\nUnfortunately, you have missed the opponent.\n", 8095);
-	write(player_fd, buf, strlen(buf));
-	//read(player_fd, buf, 8095);
-      } else if (pl_2.grid[row][column] == 'S') {
-	pl_2.grid[row][column] = 'H';
-	strncpy(buf, "\nHooray! You've landed a hit on the opponent!\n", 8095);
-	write(player_fd, buf, strlen(buf));
-	//read(player_fd, buf, 8095);
-        life2--; //player2 loses one life point
-      }
-    } else {
-      if (pl_1.grid[row][column] == 'H' || pl_1.grid[row][column] == 'M') {
-	strncpy(buf, "You've already attacked this location.\n", 8095);
-	write(player_fd, buf, strlen(buf));
-        //read(player_fd, buf, 8095);
-      } else if (pl_1.grid[row][column] == 'o') {
-        pl_1.grid[row][column] = 'M';
-        strncpy(buf, "You have missed the opponent.\n", 8095);
-	write(player_fd, buf, strlen(buf));
-        read(player_fd, buf, 8095);
-      } else if (pl_1.grid[row][column] == 'S') {
-	pl_1.grid[row][column] = 'H';
-        strncpy(buf, "You have hit the opponent!\n", 8095);
-	write(player_fd, buf, strlen(buf));
-        read(player_fd, buf, 8095);
-        life1--; //player1 loses one life point
-      }
+  } else {
+    if (pl_1.grid[row][column] == 'H' || pl_1.grid[row][column] == 'M') {
+      strncpy(buf, "You've already attacked this location.\n", 8095);
+      write(player_fd, buf, strlen(buf));
+      //read(player_fd, buf, 8095);
+    } else if (pl_1.grid[row][column] == 'o') {
+      pl_1.grid[row][column] = 'M';
+      strncpy(buf, "You have missed the opponent.\n", 8095);
+      write(player_fd, buf, strlen(buf));
+      //read(player_fd, buf, 8095);
+    } else if (pl_1.grid[row][column] == 'S') {
+      pl_1.grid[row][column] = 'H';
+      strncpy(buf, "You have hit the opponent!\n", 8095);
+      write(player_fd, buf, strlen(buf));
+      //read(player_fd, buf, 8095);
+      life1--; //player1 loses one life point
     }
   }
 }
@@ -470,6 +469,15 @@ void updateGrid(int playerNum,int player1_fd,int player2_fd) {
   }
 }
 
+void updateGrid2(int playerNum,int player1_fd,int player2_fd) {
+
+  if((playerNum) == 1) { //player 1 turn
+    printGrid2(player2_fd);
+  } else { //player 2 turn 
+    printGrid1(player1_fd);
+  }
+}
+
 /* Grid Generator*/
 void generateGrid(int x, int y, int player1_fd, int player2_fd) {
 
@@ -534,12 +542,12 @@ void battle(int playerNum, int player1_fd, int player2_fd) {
       break;
     }
     if(playerNum == 1) {
-      attack(player1_fd,playerNum);
       updateGrid(playerNum,player1_fd,player2_fd);
+      attack(player1_fd,playerNum);
       playerNum = 2;
     } else {
-      attack(player2_fd,playerNum);
       updateGrid(playerNum,player1_fd,player2_fd);
+      attack(player2_fd,playerNum);
       playerNum = 1;
     }
   }

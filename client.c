@@ -121,20 +121,20 @@ int main (int argc, char *argv[]) {
 
 	//Message about how the server decides who goes first.
 	memset(buf, 0, strlen(buf));
-	read(sockfd, buf, 87);
+	read(sockfd, buf, 85);
 	printf("%s", buf);
 
 	//Server letting the players know who is going first.
 	memset(buf, 0, strlen(buf));
-	read(sockfd, buf, 24);
+	read(sockfd, buf, 23);
 	printf("%s", buf);
 
 	//Main game loop.
 	while (1) {
 		//Receive your grid.
-		memset(buf, 0, strlen(buf));
-		read(sockfd, buf, 1337);
-		printf("%s", buf);
+                memset(buf, 0, strlen(buf));
+                read(sockfd, buf, 1337);
+                printf("%s", buf);
 
 		//Enter a row to attack.
 		memset(buf, 0, strlen(buf));
