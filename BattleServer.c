@@ -83,7 +83,10 @@ void attack(int player_fd, int playerNum) {
     write(player_fd, buf, strlen(buf));
     memset(buf, 0, strlen(buf));
     read(player_fd, buf, 8095);
-
+    
+    if(((int)buf[0] >= 97) && ((int)buf[0] <= 106)) {
+      buf[0] = (int)buf[0] - 32;
+    }
     while((int)(buf[0]) < 64 || (int)(buf[0]) > 75) { //based on ASCII table
       strncpy(buf,"Incorrect Row entered. Please try again (A-J).\n", 8095);
       write(player_fd, buf, strlen(buf));
@@ -110,7 +113,6 @@ void attack(int player_fd, int playerNum) {
 	strncpy(buf, "\nYou have already attacked this location.    \n", 8095);
 	write(player_fd, buf, strlen(buf));
 	//read(player_fd, buf, 8095);
-	continue;
       } else if (pl_2.grid[row][column] == 'o') {
 	pl_2.grid[row][column] = 'M';
 	strncpy(buf, "\nUnfortunately, you have missed the opponent.\n", 8095);
@@ -127,8 +129,7 @@ void attack(int player_fd, int playerNum) {
       if (pl_1.grid[row][column] == 'H' || pl_1.grid[row][column] == 'M') {
 	strncpy(buf, "You've already attacked this location.\n", 8095);
 	write(player_fd, buf, strlen(buf));
-        read(player_fd, buf, 8095);
-        continue;
+        //read(player_fd, buf, 8095);
       } else if (pl_1.grid[row][column] == 'o') {
         pl_1.grid[row][column] = 'M';
         strncpy(buf, "You have missed the opponent.\n", 8095);
@@ -694,7 +695,7 @@ int main(int argc, char *argv[]) {
       //start with air carrier and end with patrol boat
       positionShip(army2[ship].type, army2[ship].size, player2_fd, playerNum);
       updateGrid(playerNum,player1_fd,player2_fd);
-      numShips1--;
+      numShips2--;
     }
   }
   strncpy(buf,"\nPlease wait as the Server decides which player goes first. This is a random process\n",8095);
