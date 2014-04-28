@@ -121,6 +121,11 @@ int main (int argc, char *argv[]) {
 
 	//Main game loop.
 	while (1) {
+		//Receive your grid.
+		memset(buf, 0, strlen(buf));
+		read(sockfd, buf, 1337);
+		printf("%s", buf);
+
 		//Enter a row to attack.
 		memset(buf, 0, strlen(buf));
 		read(sockfd, buf, 26);
@@ -140,11 +145,6 @@ int main (int argc, char *argv[]) {
 		//Message about success of attack.
 		memset(buf, 0, strlen(buf));
 		read(sockfd, buf, 48);
-		printf("%s", buf);
-
-		//Receive updated grid.
-		memset(buf, 0, strlen(buf));
-		read(sockfd, buf, 1337);
 		printf("%s", buf);
 
 		//Gotta figure out how to handle the win condition.
